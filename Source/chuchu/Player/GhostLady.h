@@ -22,13 +22,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UCapsuleComponent* m_WeaponCollisionCapsule; 	//무기 캡슟 충돌체
-	UFUNCTION()
-		void OnComponentBeginOverlapWeapon(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		TArray<UAnimMontage*> m_AttackMontageArray;
 
-	bool m_DidEquipWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		TArray<UAnimMontage*>	m_SkillMontageArray;
+
 	class AWeapon* m_Weapon;
 	int32		m_AttackIndex;
 
@@ -55,6 +55,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* m_Sword;
 
+	bool				m_DidEquipWeapon;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -69,13 +71,17 @@ public:
 protected:
 	virtual void Attack();
 	virtual void Dash();
+	virtual void Skill1();
+	virtual void Skill2();
+	virtual void Skill3();
+	virtual void Skill4();
 
 public:
 	// Anim 호출
 	virtual void NormalAttack();
 	virtual void AttackEnd();
 	virtual void ChangeWeaponSocket();
-	//virtual void UseSkill(int32 Index);
+	virtual void UseSkill();
 	
 	// equip
 	void InitWeaponSocket(); //무기 탈착 시 애니메이션 , 소켓 초기화
@@ -84,4 +90,6 @@ public:
 	virtual void RemoveItem(EEquipType EquipmentType);
 	virtual void UseItem(); //아이템 냠냠
 
+	UFUNCTION()
+		void OnComponentBeginOverlapWeapon(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

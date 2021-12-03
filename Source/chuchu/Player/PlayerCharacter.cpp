@@ -86,6 +86,7 @@ APlayerCharacter::APlayerCharacter()
 	m_Death = false;
 
 	m_FallRecoveryMontage = nullptr;
+	//m_AvoidMontage = nullptr;
 
 	//고스트 트레일
 	m_PlayerMesh = nullptr;
@@ -104,6 +105,7 @@ APlayerCharacter::APlayerCharacter()
 	m_TargetFov = 120.f;  //대쉬 할 때의 target fov값
 	m_FovSpeed = 2.f;		  //대쉬 할 때의 fov speed 값
 
+	m_PushedSkillIdx = 0;
 	//Inventory
 	//Inventory = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	//	Inventory->Capacity = 20;
@@ -155,7 +157,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	//대쉬
+	EPlayerAnimType a = m_AnimInstance->GetAnimType();
+	if (a != EPlayerAnimType::Ground)
+	{
+		FString t = GetEnumToString(a);
+		//LOGSTRING(GetEnumToString(a));
+		PrintViewport(1.5f, FColor::Red, t);
+	}
+	
+	//대쉬 - 카메라 효과
 	if (1 == m_DashFov) 
 	{
 		//카메라
@@ -231,28 +241,32 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	//pressed : 누를때
 	//Released : 키를 눌렀다가 뗄 때
 	PlayerInputComponent->BindAction(TEXT("Jump"),EInputEvent::IE_Pressed,this, &APlayerCharacter::JumpKey);
+	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &APlayerCharacter::DashKey);
+	PlayerInputComponent->BindAction(TEXT("EquipWeapon"), EInputEvent::IE_Pressed, this, &APlayerCharacter::EquipWeaponKey);//
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::AttackKey);
 	PlayerInputComponent->BindAction(TEXT("Skill1"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill1Key);
 	PlayerInputComponent->BindAction(TEXT("Skill2"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill2Key);
 	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill3Key);
-	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill3Key);
-	PlayerInputComponent->BindAction(TEXT("Dash"), EInputEvent::IE_Pressed, this, &APlayerCharacter::DashKey);
-	PlayerInputComponent->BindAction(TEXT("EquipWeapon"), EInputEvent::IE_Pressed, this, &APlayerCharacter::EquipWeaponKey);
-	
+	PlayerInputComponent->BindAction(TEXT("Skill4"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill4Key);
+
 }
 
 void APlayerCharacter::SpeedUpKey(float Scale)
 {
 	m_AnimInstance->SetSpeed(Scale);
 }
-
 void APlayerCharacter::MoveFrontKey(float Scale) //키를 누를때 각 스케일 값이 전달된다. w는 1 s는 -1 둘다누르면 0
 {
+	m_FrontValue = Scale;
+
+	if (!m_AttackEnable || m_AnimInstance->GetAnimType() == EPlayerAnimType::Skill) return; // 움직이면서 공격 막음
+
 	AddMovementInput(GetActorForwardVector(), Scale);
 
 	//가만히
 	if (Scale == 0.f)
 	{
+		m_DashMontageIdx = 0;
 		m_MoveKey = false;
 		m_AnimInstance->SetDirection(0.f);
 	}
@@ -260,6 +274,7 @@ void APlayerCharacter::MoveFrontKey(float Scale) //키를 누를때 각 스케일 값이 전
 	//앞
 	else if (Scale == 1.f)
 	{
+		m_DashMontageIdx = 0;
 		m_MoveKey = true;
 		m_AnimInstance->SetDirection(0.f);
 	}
@@ -267,6 +282,7 @@ void APlayerCharacter::MoveFrontKey(float Scale) //키를 누를때 각 스케일 값이 전
 	//뒤
 	else
 	{
+		m_DashMontageIdx = 1;
 		m_MoveKey = true;
 		m_AnimInstance->SetDirection(180.f);
 	}
@@ -274,11 +290,17 @@ void APlayerCharacter::MoveFrontKey(float Scale) //키를 누를때 각 스케일 값이 전
 }
 void APlayerCharacter::MoveSideKey(float Scale) // 왼쪽 오른쪽 값들어옴
 {
-	AddMovementInput(GetActorRightVector(), Scale);
+	m_SideValue = Scale;
 
+	if (!m_AttackEnable || m_AnimInstance->GetAnimType() == EPlayerAnimType::Skill) return; // 움직이면서 공격 막음
+
+	AddMovementInput(GetActorRightVector(), Scale);
+	
 	float Direction = m_AnimInstance->GetDirection();
 	if (Scale == 1.f)
 	{
+		m_DashMontageIdx = 3; 
+
 		m_MoveKey = true;
 		if (Direction == 0.f)
 			m_AnimInstance->SetDirection(45.f);
@@ -287,6 +309,8 @@ void APlayerCharacter::MoveSideKey(float Scale) // 왼쪽 오른쪽 값들어옴
 	}
 	else if (Scale == -1.f)
 	{
+		m_DashMontageIdx = 2;
+
 		m_MoveKey = true;
 		if (Direction == 0.f)
 			m_AnimInstance->SetDirection(-45.f);
@@ -302,10 +326,8 @@ void APlayerCharacter::MoveSideKey(float Scale) // 왼쪽 오른쪽 값들어옴
 	//		m_GhostTrailTimeAcc = 0.f;
 	//		m_ActionGhostTrail = false;
 	//	}
-
 	//	m_OnGhostTrail = true;
 	//}
-
 	//else
 	//{
 	//	m_OnGhostTrail = false;
@@ -334,11 +356,16 @@ void APlayerCharacter::CameraLookUpKey(float Scale)
 	FRotator Rot = m_Arm->GetRelativeRotation();
 	Rot.Pitch += Scale * 100.f * GetWorld()->GetDeltaSeconds();
 
-	if (Rot.Pitch > 0.f)
-		Rot.Pitch = 0.f;
+	if (Rot.Pitch > 40.f)
+		Rot.Pitch = 40.f;
 
 	else if (Rot.Pitch < -45.f)
 		Rot.Pitch = -45.f;
+
+	//로그 출력 가능
+	//LOG(TEXT("Attack :%d"), Scale);
+	//LOG(TEXT("TestAttack"));
+	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("X : %.5f Y : %.5f"), Scale, Rot.Pitch));
 
 	m_Arm->SetRelativeRotation(Rot);
 } 
@@ -364,6 +391,8 @@ void APlayerCharacter::JumpKey()
 }
 void APlayerCharacter::AttackKey()
 {
+	if (m_AnimInstance->GetAnimType() == EPlayerAnimType::Skill) return; // 스킬 쓸 때 공격 막음
+
 	if (m_AttackEnable)
 	{
 		m_AttackEnable = false; //어택 키가 한번 들어오는 순간 공격 상태가 아니게 된다 중복 막는것 
@@ -379,23 +408,41 @@ void APlayerCharacter::EquipWeaponKey()
 
 	if (m_AnimInstance->GetAnimType() == EPlayerAnimType::Ground)
 	{
-		m_AnimInstance->ChangeAnimType(EPlayerAnimType::Dash);
-		//bool RetValue = EquipWeapon();
-		//if(RetValue) m_AnimInstance->ChangeAnimType(EPlayerAnimType::Ground);
+		m_AnimInstance->ChangeAnimType(EPlayerAnimType::Equip);
 	}
 	
 }
 
 void APlayerCharacter::DashKey()
 {
-	//Dash(); // 캐릭터 fx
-	if (m_CanDash)
-	{
-		Dash();
+	if (m_AnimInstance->GetAnimType() != EPlayerAnimType::Ground) return;
 
-		GetCharacterMovement()->BrakingFrictionFactor = 0.f; //마찰력을 0으로 설정, 땅에 닿을때 속도가 느려지는 것을 방지하기 위함
-		LaunchCharacter(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0).GetSafeNormal() * m_DashDistance, true, true);
-		//카메라 위아래로 움직짐 방지, 지정된 단위의 방향으로 캐릭터 발사
+	//* Anim BP에서 장비 착용시 몽타주 재생이 가능하도록 되어있어서, 장비 착용하지 않았을 때 ~ 대시사용 시 노티파이가 불리지 않는다. ~
+	//int32 MontageIdx = 0;
+	if (m_CanDash && m_AttackEnable) // 그러므로 공격 가능시에만 대시를 사용할 수 있도록 
+	{
+		Dash(); //캐릭터 fx
+
+		if (m_FrontValue == 0 && m_SideValue == 0) //기본 앞구르기
+		{
+			GetCharacterMovement()->BrakingFrictionFactor = 0.f; //마찰력을 0으로 설정, 땅에 닿을때 속도가 느려지는 것을 방지하기 위함
+			LaunchCharacter(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0).GetSafeNormal() * m_DashDistance, true, true);//카메라 위아래로 움직짐 방지, 지정된 단위의 방향으로 캐릭터 발사
+		}
+		else
+		{
+			/*
+			FVector GetVel = FVector(m_FrontValue, m_SideValue, 0.f); // 시점이 바뀌면 딴대로 굴러감 
+			GetVel.Normalize();
+			*/
+			FVector GetVel = GetVelocity(); // 현재의 Actor 속도를 구할 수 있다.
+			GetVel.Normalize();
+			GetCharacterMovement()->BrakingFrictionFactor = 0.f; //마찰력을 0으로 설정, 땅에 닿을때 속도가 느려지는 것을 방지하기 위함
+			LaunchCharacter(GetVel * m_DashDistance, true, true);
+		}
+		//몽타주 재생
+		m_AnimInstance->ChangeAnimType(EPlayerAnimType::Avoid);
+		PlayAnimMontage(m_ArrayAvoidMontage[m_DashMontageIdx], 1.8, NAME_None);
+		
 		m_CanDash = false;
 		m_DashFov = 1;
 		GetWorldTimerManager().SetTimer(UnusedHandle, this, &APlayerCharacter::StopDashing, m_DashStop, false); //dashstop시간 이후 함수 호출
@@ -420,18 +467,24 @@ void APlayerCharacter::ResetDash()
 
 void APlayerCharacter::Skill1Key()
 {
+	m_PushedSkillIdx = 1;
 	Skill1(); // playercharacter을 상속받은 클래스의 skill1 함수가 호출 (greystone class의 함수가 호출)
 }
 void APlayerCharacter::Skill2Key()
 {
+	m_PushedSkillIdx = 2;
 	Skill2(); // playercharacter을 상속받은 클래스의 skill2 함수가 호출 (greystone class의 함수가 호출)
 }
 void APlayerCharacter::Skill3Key()
 {
-	Skill3(); // playercharacter을 상속받은 클래스의 skill2 함수가 호출 (greystone class의 함수가 호출)
+	m_PushedSkillIdx = 3;
+	Skill3();
 }
-
-
+void APlayerCharacter::Skill4Key()
+{
+	m_PushedSkillIdx = 4;
+	Skill4(); 
+}
 
 void APlayerCharacter::GhostTrailEnd()
 {
@@ -489,7 +542,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount,struct FDamageEvent const&
 		}
 	}
 
-
 	if (IsValid(m_HPBarWidget)) 
 	{
 		m_HPBarWidget->SetHPPercent(m_PlayerInfo.HP / (float)m_PlayerInfo.HPMax);
@@ -498,7 +550,6 @@ float APlayerCharacter::TakeDamage(float DamageAmount,struct FDamageEvent const&
 	//카메라 쉐이트
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(
 		UHitCameraShake::StaticClass());
-
 
 	return Damage;
 }
@@ -581,23 +632,15 @@ void APlayerCharacter::FootStep(bool Left)
 
 		if (Phys)
 		{
-			//PrintViewport(1.f, FColor::Red, TEXT("o")); //TEXT("^.^"));
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), Phys->GetSound(), result.ImpactPoint);
 		}
-
-		//else
-			//PrintViewport(1.f, FColor::Red, TEXT("x")); //TEXT("OTL"));
-	}
-
-	else
-	{
-		//PrintViewport(1.f, FColor::Red, TEXT("?")); // TEXT("T.T"));
 	}
 }
 
 void APlayerCharacter::Skill1() {}
 void APlayerCharacter::Skill2() {}
 void APlayerCharacter::Skill3() {}
+void APlayerCharacter::Skill4() {}
 void APlayerCharacter::Dash() {}
 void APlayerCharacter::Attack() {}
 void APlayerCharacter::NormalAttack() {}
@@ -605,7 +648,7 @@ void APlayerCharacter::AttackEnd()
 {
 	m_AttackEnable = true;
 }
-
+void APlayerCharacter::UseSkill() {}
 void APlayerCharacter::UseSkill(int32 Index) {}
 void APlayerCharacter::UseSkillFire(int32 Index) {}
 void APlayerCharacter::RemoveItem(EEquipType EquipmentType) {}

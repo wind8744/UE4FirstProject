@@ -22,8 +22,7 @@ void UPlayerAnim::NativeInitializeAnimation() //초기화 될 때
 }
 
 void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds) //프레임마다 호출되는 함수
-{
-	Super::NativeUpdateAnimation(DeltaSeconds);
+{Super::NativeUpdateAnimation(DeltaSeconds);
 
 	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
 
@@ -49,11 +48,12 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds) //프레임마다 호출되�
 				m_AnimType = EPlayerAnimType::Ground;
 			}
 
-			if (!m_OnGround && m_AnimType != EPlayerAnimType::Jump)
+			if (!m_OnGround && m_AnimType != EPlayerAnimType::Jump && m_AnimType != EPlayerAnimType::Avoid && m_AnimType != EPlayerAnimType::Skill)
 			{
 				m_AnimType = EPlayerAnimType::Fall;
 				m_FallRecoveryAdditive = 0.f;
 			}
+			
 			//걷는 속도 조절
 			Movement->MaxWalkSpeed = 600.f + (600.f * m_fRun); //걷기속도 + 뛸 때 속도
 		}
@@ -207,9 +207,32 @@ void UPlayerAnim:: AnimNotify_EquipEnd()
 	m_DidEquipWeapon = true; 
 	m_AnimType = EPlayerAnimType::Ground; 
 }
+
+void UPlayerAnim::AnimNotify_AvoidEnd()
+{
+	m_AnimType = EPlayerAnimType::Ground;
+}
 	
 void UPlayerAnim::InitWeaponAnimPose()
 {
 	m_DidEquipWeapon = false;
+	m_AnimType = EPlayerAnimType::Ground;
+}
+
+
+void UPlayerAnim::AnimNotify_SkillStart()
+{
+	m_Attack = false;
+	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
+
+	if (Player)
+	{
+		Player->UseSkill();
+		Player->AttackEnd();
+	}
+}
+
+void UPlayerAnim::AnimNotify_SkillEnd()
+{
 	m_AnimType = EPlayerAnimType::Ground;
 }

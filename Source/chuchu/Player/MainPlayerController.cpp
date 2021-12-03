@@ -21,8 +21,8 @@ void AMainPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction(TEXT("PickItem"), EInputEvent::IE_Pressed, this, &AMainPlayerController::MouseClick);
-	InputComponent->BindAction(TEXT("PickItem"), EInputEvent::IE_Released, this, &AMainPlayerController::MouseReleased);
+	//InputComponent->BindAction(TEXT("PickItem"), EInputEvent::IE_Pressed, this, &AMainPlayerController::MouseClick);
+	//InputComponent->BindAction(TEXT("PickItem"), EInputEvent::IE_Released, this, &AMainPlayerController::MouseReleased);
 }
 
 void AMainPlayerController:: MouseClick()

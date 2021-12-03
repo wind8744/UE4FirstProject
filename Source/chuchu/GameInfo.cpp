@@ -22,3 +22,12 @@ FString GetEnumToString(EEquipType value)
     }
     return enumPtr->GetEnumName((int32)value);
 }
+FString GetEnumToString(EPlayerAnimType value)
+{
+    const UEnum* enumPtr = FindObject<UEnum>(ANY_PACKAGE, TEXT("EPlayerAnimType"), true);
+    if (!enumPtr)
+    {
+        return FString("Invalid");
+    }
+    return enumPtr->GetEnumName((int32)value);
+}

@@ -49,6 +49,9 @@ protected:
 
 	UAnimMontage* m_FallRecoveryMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		TArray<UAnimMontage*> m_ArrayAvoidMontage;
+
 	class UTextureRenderTarget2D* m_FaceTarget;
 	class UHPBar* m_HPBarWidget;
 
@@ -74,7 +77,6 @@ protected:
 
 	float		m_GhostTrailTimeAcc;
 
-
 	bool				m_MoveKey;
 	bool				m_AttackEnable; //공격 가능상태인지 아닌지
 	bool				m_Death;
@@ -95,8 +97,14 @@ protected:
 
 	int m_DashFov;
 	bool m_CanDash;
+	int32 m_DashMontageIdx; 
+	int32 m_PushedSkillIdx;
 
 	FTimerHandle UnusedHandle;
+
+	//Avoid
+	float m_SideValue;
+	float m_FrontValue;
 
 	virtual void EquipItem(EEquipType EquipmentType, const FString& EquipmentPath); //아이템 장착
 	virtual void RemoveItem(EEquipType EquipmentType); //아이템 해제
@@ -153,6 +161,7 @@ public:
 	void Skill1Key();
 	void Skill2Key();
 	void Skill3Key();
+	void Skill4Key();
 	void DashKey();
 	void EquipWeaponKey();
 
@@ -161,11 +170,13 @@ protected:
 	virtual void Skill1();
 	virtual void Skill2();
 	virtual void Skill3();
+	virtual void Skill4();
 	virtual void Dash();
 
 public:
 	virtual void NormalAttack();
 	virtual void AttackEnd();
+	virtual void UseSkill();
 	virtual void UseSkill(int32 Index);
 	virtual void UseSkillFire(int32 Index);
 	
@@ -188,5 +199,7 @@ public:
 
 public:
 	void FootStep(bool Left);
+
+
 };
 // Fill out your copyright notice in the Description page of Project Settings.

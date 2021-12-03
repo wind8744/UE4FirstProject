@@ -25,15 +25,32 @@ AGhostLady::AGhostLady()
 		GetMesh()->SetAnimInstanceClass(GhostAnimAsset.Class);
 
 	//몽타주 (Attack)
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> Attack1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/AMGhostLadyAttack1.AMGhostLadyAttack1'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Attack1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Attack/AMGhostLadyAttack1.AMGhostLadyAttack1'"));
 	if (Attack1Asset.Succeeded()) 
 		m_AttackMontageArray.Add(Attack1Asset.Object);
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> Attack2Asset(TEXT("AnimMontage'/Game/Player/GhostLady/AMGhostLadyAttack2.AMGhostLadyAttack2'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Attack2Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Attack/AMGhostLadyAttack2.AMGhostLadyAttack2'"));
 	if (Attack2Asset.Succeeded())
 		m_AttackMontageArray.Add(Attack2Asset.Object);
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> Attack3Asset(TEXT("AnimMontage'/Game/Player/GhostLady/AMGhostLadyAttack3.AMGhostLadyAttack3'"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Attack3Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Attack/AMGhostLadyAttack3.AMGhostLadyAttack3'"));
 	if (Attack3Asset.Succeeded())
 		m_AttackMontageArray.Add(Attack3Asset.Object);
+
+	//몽타주 (Skill)
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill1.AMGhostLadySkill1'"));
+	if (Skill1Asset.Succeeded())
+		m_SkillMontageArray.Add(Skill1Asset.Object);
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill2Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill2.AMGhostLadySkill2'"));
+	if (Skill2Asset.Succeeded())
+		m_SkillMontageArray.Add(Skill2Asset.Object);
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill3Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill3.AMGhostLadySkill3'"));
+	if (Skill3Asset.Succeeded())
+		m_SkillMontageArray.Add(Skill3Asset.Object);
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill4Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill4.AMGhostLadySkill4'"));
+	if (Skill4Asset.Succeeded())
+		m_SkillMontageArray.Add(Skill4Asset.Object);
 
 	//fall reconvery 몽타주
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>	FallRecoveryAsset(TEXT("AnimMontage'/Game/Player/GhostLady/AMGhostLadyFallRecovery.AMGhostLadyFallRecovery'"));
@@ -49,6 +66,20 @@ AGhostLady::AGhostLady()
 		m_FallRecoveryMontage->BlendOut.SetBlendOption(EAlphaBlendOption::Cubic); //블랜딩 옵션
 		m_FallRecoveryMontage->BlendOut.SetBlendTime(0.1f);
 	}
+
+	// Avoid 몽ㅌㅏ주
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Avoid1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Avoid/AMGhostLadyAvoid1.AMGhostLadyAvoid1'"));
+	if (Avoid1Asset.Succeeded())
+		m_ArrayAvoidMontage.Add(Avoid1Asset.Object);
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Avoid2Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Avoid/AMGhostLadyAvoid1_2.AMGhostLadyAvoid1_2'"));
+	if (Avoid2Asset.Succeeded())
+		m_ArrayAvoidMontage.Add(Avoid2Asset.Object);
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Avoid3Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Avoid/AMGhostLadyAvoid1_3.AMGhostLadyAvoid1_3'"));
+	if (Avoid3Asset.Succeeded())
+		m_ArrayAvoidMontage.Add(Avoid3Asset.Object);
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Avoid4Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Avoid/AMGhostLadyAvoid1_4.AMGhostLadyAvoid1_4'"));
+	if (Avoid4Asset.Succeeded())
+		m_ArrayAvoidMontage.Add(Avoid4Asset.Object);
 
 	// Trail -> 메테리얼 바꾸어주면 됨.
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>	TrailAsset(TEXT("ParticleSystem'/Game/Particle/PSPlayerTrail.PSPlayerTrail'"));
@@ -153,8 +184,15 @@ void AGhostLady::Dash()
 	FActorSpawnParameters	param;
 	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
+	//if (m_DashTrail)
+	//	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DashTrail, GetActorLocation(), GetActorForwardVector().Rotation());
+
+	FVector ActorVelovity = GetVelocity();
+	ActorVelovity.Normalize();
+
 	if (m_DashTrail)
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DashTrail, GetActorLocation(), GetActorForwardVector().Rotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DashTrail, GetActorLocation(), ActorVelovity.Rotation());
+
 
 	//비동기 에셋 로딩
 	//ANormalEffect* Effect2 = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),
@@ -320,4 +358,71 @@ void AGhostLady::InitWeaponSocket()
 {
 	m_Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SWORD"));
 	m_AnimInstance->InitWeaponAnimPose();
+}
+
+
+void AGhostLady::Skill1() // 바꾸기
+{
+	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[0]))
+	{
+		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[0], 0.f);
+		m_AnimInstance->Montage_Play(m_SkillMontageArray[0]);
+	}
+}
+void AGhostLady::Skill2()
+{
+	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[1]))
+	{
+		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[1], 0.f);
+		m_AnimInstance->Montage_Play(m_SkillMontageArray[1]);
+	}
+}
+void AGhostLady::Skill3()
+{
+	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[2]))
+	{
+		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[2], 0.f);
+		m_AnimInstance->Montage_Play(m_SkillMontageArray[2]);
+	}
+}
+void AGhostLady::Skill4()
+{
+	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[3]))
+	{
+		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[3], 0.f);
+		m_AnimInstance->Montage_Play(m_SkillMontageArray[3]);
+	}
+}
+void AGhostLady::UseSkill()
+{
+	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //공격이 시작될 때 콜리전 활성화
+
+	switch (m_PushedSkillIdx)
+	{
+		case 1:
+		{
+			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+			break;
+		}
+		case 2: //재사용 대기시간
+		{
+			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+			LaunchCharacter(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.5f).GetSafeNormal() * 1000.f, true, true);//카메라 위아래로 움직짐 방지, 지
+			//GetWorldTimerManager().SetTimer(UnusedHandle, this, &APlayerCharacter::StopDashing, m_DashStop, false); //dashstop시간 이후 함수 호출
+			break;
+		}
+		case 3: //키다운
+		{
+			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+			break;
+		}
+		case 4: //스택 
+		{
+			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+			break;
+		}
+		default:
+			break;
+	}
+
 }

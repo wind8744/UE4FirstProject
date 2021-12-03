@@ -35,6 +35,19 @@ DECLARE_LOG_CATEGORY_EXTERN(chuchu, Log, All);
 //에디터에 출력해보는 방법
 void PrintViewport(float Time, const FColor& Color, const FString& Text);
 FString GetEnumToString(EEquipType value);
+FString GetEnumToString(EPlayerAnimType value);
+
+UENUM(BlueprintType) //블루프린트로 사용할 수 있는것을 알려주어야 함
+enum class EPlayerAnimType : uint8
+{
+	Ground,
+	Jump,
+	Fall,
+	Death,
+	Avoid,
+	Equip, //equip으로 사용중
+	Skill,
+};
 
 // 플레이어의 정보를 일일히 쓰는건 번거로우므로 구조체를 만들어서 사용
 UENUM(BlueprintType)

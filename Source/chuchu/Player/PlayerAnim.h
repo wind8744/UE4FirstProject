@@ -6,17 +6,6 @@
 #include "Animation/AnimInstance.h"
 #include "PlayerAnim.generated.h"
 
-UENUM(BlueprintType) //블루프린트로 사용할 수 있는것을 알려주어야 함
-enum class EPlayerAnimType : uint8
-{
-	Ground,
-	Jump,
-	Fall,
-	Death,
-	Avoid,
-	Dash,
-};
-
 UCLASS()
 class CHUCHU_API UPlayerAnim : public UAnimInstance
 {
@@ -73,8 +62,6 @@ public:
 	}
 
 	void InitWeaponAnimPose(); //플레이어 무기 탈착시 호출
-
-	//void SetDidEquipWeapon(bool Value) { m_DidEquipWeapon = Value; }
 
 public:
 	virtual void NativeInitializeAnimation();
@@ -134,4 +121,15 @@ public:
 
 	UFUNCTION()
 		void AnimNotify_EquipEnd();// { m_DidEquipWeapon = true; m_AnimType = EPlayerAnimType::Ground; }
+
+	UFUNCTION()
+		void AnimNotify_AvoidEnd();
+
+	// ghost lady ~ skill start , end
+	
+	UFUNCTION()
+		void AnimNotify_SkillStart();
+
+	UFUNCTION()
+		void AnimNotify_SkillEnd();
 };
