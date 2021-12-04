@@ -236,3 +236,11 @@ void UPlayerAnim::AnimNotify_SkillEnd()
 {
 	m_AnimType = EPlayerAnimType::Ground;
 }
+
+void UPlayerAnim::AnimNotify_LoopStart()
+{
+	//m_Attack = true;
+
+	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
+	Player->Skill3Loop();
+}

@@ -7,6 +7,7 @@
 #include "../Effect/AuroraSkill1.h"
 #include "../Effect/GreyStoneSkill1.h"
 #include "../UIItem/ItemData.h"
+#include "Components/WidgetComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GhostLady.generated.h"
 /**
@@ -57,6 +58,22 @@ public:
 
 	bool				m_DidEquipWeapon;
 
+	//스킬 관련 멤버함수
+	bool				m_Skill2Enable;
+	float				m_Skill2CoolTime;
+	FTimerHandle		m_Skill2Handle;
+
+	//hp bar
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UWidgetComponent* m_CoolTimebarWidget;
+
+	class UCoolTimeBar* m_CoolTimebar;
+	bool			    m_StartTimer;
+	bool				m_Skill3Enable;
+	float				m_Skill3CoolTime;
+	float				m_SKill3AccTime;
+	FTimerHandle		m_Skill3Handle;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -74,7 +91,12 @@ protected:
 	virtual void Skill1();
 	virtual void Skill2();
 	virtual void Skill3();
+	virtual void Skill3Released();
 	virtual void Skill4();
+
+	//타이머 호출
+	void InitSkill2();
+	void EnableSkill3();
 
 public:
 	// Anim 호출
@@ -82,13 +104,18 @@ public:
 	virtual void AttackEnd();
 	virtual void ChangeWeaponSocket();
 	virtual void UseSkill();
-	
+
+	//skill
+	virtual void Skill3Loop();
+
 	// equip
 	void InitWeaponSocket(); //무기 탈착 시 애니메이션 , 소켓 초기화
 
 	virtual void EquipItem(EEquipType EquipmentType, const FString& EquipmentPath); //아이템 장착
 	virtual void RemoveItem(EEquipType EquipmentType);
 	virtual void UseItem(); //아이템 냠냠
+
+
 
 	UFUNCTION()
 		void OnComponentBeginOverlapWeapon(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

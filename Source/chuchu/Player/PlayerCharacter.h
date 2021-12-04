@@ -11,15 +11,6 @@
 
 class UNiagaraSystem;
 
-USTRUCT(BlueprintType)
-struct FMyEquip
-{
-	GENERATED_BODY()
-public:
-	bool DidEquip;
-	FString EquipPath;
-};
-
 UCLASS(config = MainAsset)
 class CHUCHU_API APlayerCharacter : public ACharacter
 {
@@ -161,6 +152,7 @@ public:
 	void Skill1Key();
 	void Skill2Key();
 	void Skill3Key();
+	void Skill3KeyReleased();
 	void Skill4Key();
 	void DashKey();
 	void EquipWeaponKey();
@@ -170,6 +162,7 @@ protected:
 	virtual void Skill1();
 	virtual void Skill2();
 	virtual void Skill3();
+	virtual void Skill3Released();
 	virtual void Skill4();
 	virtual void Dash();
 
@@ -179,6 +172,7 @@ public:
 	virtual void UseSkill();
 	virtual void UseSkill(int32 Index);
 	virtual void UseSkillFire(int32 Index);
+	virtual void Skill3Loop();
 	
 	void GhostTrailEnd();
 	void OnGhostTrail();

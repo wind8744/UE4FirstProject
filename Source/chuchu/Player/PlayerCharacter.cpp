@@ -59,6 +59,7 @@ APlayerCharacter::APlayerCharacter()
 	m_HPBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBar"));
 	m_HPBar->SetupAttachment(GetMesh());
 
+	/*
 	static ConstructorHelpers::FClassFinder<UUserWidget>	HPBarAsset(TEXT("WidgetBlueprint'/Game/UI/UI_HPBar.UI_HPBar_C'"));
 
 	if (HPBarAsset.Succeeded())
@@ -68,6 +69,7 @@ APlayerCharacter::APlayerCharacter()
 	m_HPBar->SetDrawSize(FVector2D(200.f, 60.f));
 	m_HPBar->SetRelativeLocation(FVector(0.f, 0.f, 230.f));
 	m_HPBar->SetBlendMode(EWidgetBlendMode::Transparent);
+	*/
 
 	//렌더 타겟 텍스쳐( 얼굴 찍히는 것)
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D>	FaceTargetObj(TEXT("TextureRenderTarget2D'/Game/Player/RTPlayerFace.RTPlayerFace'"));
@@ -117,11 +119,13 @@ void APlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	//Hp bar widget
-	m_HPBarWidget = Cast<UHPBar>(m_HPBar->GetWidget()); //??? user interface -> tickmode disable로 설정하면 안뜸.. ㅡㅡ?
-
+	/*
+		m_HPBarWidget = Cast<UHPBar>(m_HPBar->GetWidget()); //??? user interface -> tickmode disable로 설정하면 안뜸.. ㅡㅡ?
+		m_HPBarWidget->SetDelegate<APlayerCharacter>(this, &APlayerCharacter::NameWidgetCallback);
+	*/
 	m_AnimInstance = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 
-	m_HPBarWidget->SetDelegate<APlayerCharacter>(this, &APlayerCharacter::NameWidgetCallback);
+
 
 	AchuchuGameModeBase* GameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
 
@@ -157,12 +161,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	
 	EPlayerAnimType a = m_AnimInstance->GetAnimType();
 	if (a != EPlayerAnimType::Ground)
 	{
 		FString t = GetEnumToString(a);
-		//LOGSTRING(GetEnumToString(a));
-		PrintViewport(1.5f, FColor::Red, t);
+		LOGSTRING(GetEnumToString(a));
+		//PrintViewport(1.5f, FColor::Red, t);
 	}
 	
 	//대쉬 - 카메라 효과
@@ -246,9 +251,16 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::AttackKey);
 	PlayerInputComponent->BindAction(TEXT("Skill1"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill1Key);
 	PlayerInputComponent->BindAction(TEXT("Skill2"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill2Key);
-	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill3Key);
-	PlayerInputComponent->BindAction(TEXT("Skill4"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill4Key);
 
+	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill3Key);
+	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Released, this, &APlayerCharacter::Skill3KeyReleased);
+
+	PlayerInputComponent->BindAction(TEXT("Skill4"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill4Key);
+}
+
+void APlayerCharacter::Skill3KeyReleased()
+{
+	Skill3Released();
 }
 
 void APlayerCharacter::SpeedUpKey(float Scale)
@@ -541,11 +553,12 @@ float APlayerCharacter::TakeDamage(float DamageAmount,struct FDamageEvent const&
 			}
 		}
 	}
-
+	/*
 	if (IsValid(m_HPBarWidget)) 
 	{
 		m_HPBarWidget->SetHPPercent(m_PlayerInfo.HP / (float)m_PlayerInfo.HPMax);
 	}
+	*/
 
 	//카메라 쉐이트
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(
@@ -640,6 +653,7 @@ void APlayerCharacter::FootStep(bool Left)
 void APlayerCharacter::Skill1() {}
 void APlayerCharacter::Skill2() {}
 void APlayerCharacter::Skill3() {}
+void APlayerCharacter::Skill3Released(){}
 void APlayerCharacter::Skill4() {}
 void APlayerCharacter::Dash() {}
 void APlayerCharacter::Attack() {}
@@ -655,3 +669,4 @@ void APlayerCharacter::RemoveItem(EEquipType EquipmentType) {}
 void APlayerCharacter::EquipItem(EEquipType EquipmentType, const FString& EquipmentPath) {}
 void APlayerCharacter::UseItem() {}
 void APlayerCharacter::ChangeWeaponSocket() {}
+void APlayerCharacter::Skill3Loop(){}

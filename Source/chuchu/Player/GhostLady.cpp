@@ -7,6 +7,7 @@
 #include "Weapon.h"
 #include "../Effect/GhostTrail.h"
 #include "../Monster/Monster.h"
+#include "../UI/CoolTimeBar.h"
 
 AGhostLady::AGhostLady()
 {
@@ -51,8 +52,12 @@ AGhostLady::AGhostLady()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill4Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill4.AMGhostLadySkill4'"));
 	if (Skill4Asset.Succeeded())
 		m_SkillMontageArray.Add(Skill4Asset.Object);
+	
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill2LoopAsset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill3Loop.AMGhostLadySkill3Loop'"));
+	if (Skill2LoopAsset.Succeeded())
+		m_SkillMontageArray.Add(Skill2LoopAsset.Object);
 
-	//fall reconvery 몽타주
+	//몽타주 (fall reconvery)
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>	FallRecoveryAsset(TEXT("AnimMontage'/Game/Player/GhostLady/AMGhostLadyFallRecovery.AMGhostLadyFallRecovery'"));
 
 	if (FallRecoveryAsset.Succeeded())
@@ -67,7 +72,7 @@ AGhostLady::AGhostLady()
 		m_FallRecoveryMontage->BlendOut.SetBlendTime(0.1f);
 	}
 
-	// Avoid 몽ㅌㅏ주
+	//몽타주 (Avoid)
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> Avoid1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Avoid/AMGhostLadyAvoid1.AMGhostLadyAvoid1'"));
 	if (Avoid1Asset.Succeeded())
 		m_ArrayAvoidMontage.Add(Avoid1Asset.Object);
@@ -86,13 +91,14 @@ AGhostLady::AGhostLady()
 	if (TrailAsset.Succeeded())
 		m_Trail->SetTemplate(TrailAsset.Object);
 
-	//// Dash Trail
+	// Dash Asset
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> DashTrailAsset(TEXT("NiagaraSystem'/Game/BlinkAndDashVFX/VFX_Niagara/NS_Dash_Vampire.NS_Dash_Vampire'"));
 	if (DashTrailAsset.Succeeded())
 		m_DashTrail = DashTrailAsset.Object;
 
-	//Equip
-
+	// ==========
+	// Equip
+	// ==========
 	//헬멧
 	m_Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
 	m_Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("HAIR")); //소켓 이름
@@ -120,7 +126,6 @@ AGhostLady::AGhostLady()
 	m_Hair->SetSkeletalMesh(GhostLadyHairAsset.Object);
 	//m_Hair->SetRelativeLocation(FVector(0.f, 4.f, -166.f));
 
-
 	//칼
 	m_Sword = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword")); //	
 	m_Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SWORD"));   // 블렌딩 때 소켓 안움직임
@@ -140,8 +145,38 @@ AGhostLady::AGhostLady()
 	m_WeaponCollisionCapsule->SetRelativeScale3D(FVector(1.f, 1.f, 2.25f));
 	m_WeaponCollisionCapsule->SetCollisionProfileName(("WeaponCollision"));
 	m_WeaponCollisionCapsule->OnComponentBeginOverlap.AddDynamic(this, &AGhostLady::OnComponentBeginOverlapWeapon);
-	//Equip ==================== end
 
+	// ==========
+	// CoolTime Wiget
+	// ==========
+	m_CoolTimebarWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("CoolTimebarWidget"));
+	m_CoolTimebarWidget->SetupAttachment(GetMesh());
+
+	static ConstructorHelpers::FClassFinder<UUserWidget> BarAsset(TEXT("WidgetBlueprint'/Game/UI/UI_CoolTimeBar.UI_CoolTimeBar_C'"));
+
+	if (BarAsset.Succeeded())
+		m_CoolTimebarWidget->SetWidgetClass(BarAsset.Class);
+
+	m_CoolTimebarWidget->SetWidgetSpace(EWidgetSpace::Screen); // 물체에 가려지지 않는다 world는 메쉬에 가려짐
+	m_CoolTimebarWidget->SetDrawSize(FVector2D(200.f, 60.f));
+	m_CoolTimebarWidget->SetRelativeLocation(FVector(0.f, 0.f, 230.f));
+	m_CoolTimebarWidget->SetBlendMode(EWidgetBlendMode::Transparent);
+	m_CoolTimebarWidget->SetVisibility(false);
+
+	// ==========
+	// Skill
+	// ==========		
+	m_Skill2CoolTime = 3.f;
+	m_Skill2Enable = true;
+
+	m_StartTimer = false;
+	m_Skill3Enable = false;
+	m_Skill3CoolTime = 1.5f;
+	m_SKill3AccTime = 0.f;
+
+	// ==========
+	// PlayerInfo
+	// ==========
 	m_DidEquipWeapon = false;
 	m_AttackIndex = 0;
 	m_PlayerInfo.Name = TEXT("GHostLady");
@@ -164,13 +199,38 @@ void AGhostLady::BeginPlay()
 	// Super : 부모클래스를 의미한다.
 	Super::BeginPlay();
 
-}
+	//bar widget
+	m_CoolTimebar = Cast<UCoolTimeBar>(m_CoolTimebarWidget->GetWidget());
 
+}
+#include "../UI/HPBar.h"
 // Called every frame
 void AGhostLady::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	//if (IsValid(m_HPBarWidget) && m_StartTimer)
+	if (IsValid(m_CoolTimebar) && m_StartTimer)
+	{
+		LOG(TEXT("m_SKill3AccTime :%.5f"), m_SKill3AccTime);
+		m_SKill3AccTime += DeltaTime;
+		//m_HPBarWidget->SetHPPercent((float)m_SKill3AccTime/(float)m_Skill3CoolTime);
+		m_CoolTimebar->SetCoolTimePercent((float)m_SKill3AccTime / (float)m_Skill3CoolTime);
+		if (m_SKill3AccTime > m_Skill3CoolTime)
+		{
+			m_Skill3Enable = true;
+			m_StartTimer = false;
+		}
+	}
+	
+	//앞으로 이동
+	//AddMovementInput(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.5f).GetSafeNormal(), 0.5, true);
+	
+	//앞으로 쏘기
+	//GetCharacterMovement()->BrakingFrictionFactor = 0.f; //마찰력을 0으로 설정, 땅에 닿을때 속도가 느려지는 것을 방지하기 위함
+	//LaunchCharacter(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0).GetSafeNormal() * m_DashDistance, true, true);
+	//GetCharacterMovement()->StopMovementImmediately(); //이동 중지 호출
+	//GetCharacterMovement()->BrakingFrictionFactor = 2.f; //마찰력 초기화
 }
 
 // Called to bind functionality to input
@@ -257,6 +317,10 @@ void AGhostLady::AttackEnd()
 
 	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	m_AttackIndex = 0;
+
+	m_SKill3AccTime = 0.f;
+	m_StartTimer = false;
+	m_Skill3Enable = false;
 }
 
 void AGhostLady::EquipItem(EEquipType EquipmentType, const FString& EquipmentPath)
@@ -371,20 +435,52 @@ void AGhostLady::Skill1() // 바꾸기
 }
 void AGhostLady::Skill2()
 {
-	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[1]))
+	if (m_Skill2Enable && !m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[1]))
 	{
 		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[1], 0.f);
 		m_AnimInstance->Montage_Play(m_SkillMontageArray[1]);
 	}
 }
+
+void AGhostLady::InitSkill2() //타이머 호출
+{
+	m_Skill2Enable = true;
+}
+
 void AGhostLady::Skill3()
+{
+	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[4]))
+	{
+		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[4], 0.f);
+		m_AnimInstance->Montage_Play(m_SkillMontageArray[4]);
+		
+		m_StartTimer = true;
+		m_CoolTimebarWidget->ToggleVisibility();
+		//GetWorldTimerManager().SetTimer(m_Skill3Handle, this, &AGhostLady::EnableSkill3, m_Skill3CoolTime, false); //dashstop시간 이후 함수 호출
+	}
+}
+
+//void AGhostLady::EnableSkill3() //타이머 호출, 키다운 쿨타임 이후 공격 가능하도록 불림
+//{
+//	m_Skill3Enable = true;
+//}
+
+void AGhostLady::Skill3Loop()
+{
+	m_AnimInstance->Montage_Play(m_SkillMontageArray[4], 0.5f, EMontagePlayReturnType::MontageLength, 1.f, false);
+}
+
+void AGhostLady::Skill3Released()
 {
 	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[2]))
 	{
 		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[2], 0.f);
 		m_AnimInstance->Montage_Play(m_SkillMontageArray[2]);
+
+		m_CoolTimebarWidget->ToggleVisibility();
 	}
 }
+
 void AGhostLady::Skill4()
 {
 	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[3]))
@@ -393,6 +489,8 @@ void AGhostLady::Skill4()
 		m_AnimInstance->Montage_Play(m_SkillMontageArray[3]);
 	}
 }
+
+// Anim Notify에서 들어오는 곳
 void AGhostLady::UseSkill()
 {
 	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //공격이 시작될 때 콜리전 활성화
@@ -402,18 +500,34 @@ void AGhostLady::UseSkill()
 		case 1:
 		{
 			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+
 			break;
 		}
 		case 2: //재사용 대기시간
 		{
 			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
 			LaunchCharacter(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.5f).GetSafeNormal() * 1000.f, true, true);//카메라 위아래로 움직짐 방지, 지
-			//GetWorldTimerManager().SetTimer(UnusedHandle, this, &APlayerCharacter::StopDashing, m_DashStop, false); //dashstop시간 이후 함수 호출
+			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); //dashstop시간 이후 함수 호출
+
+			m_Skill2Enable = false;
+
 			break;
 		}
 		case 3: //키다운
 		{
 			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+			
+			if (m_Skill3Enable)
+			{
+				//최대 대미지
+				PrintViewport(1.f, FColor::Red, TEXT("max")); //Loop
+			}
+			else
+			{
+				//그냥 데미지
+				PrintViewport(1.f, FColor::Blue, TEXT("normal")); //Loop
+			}
+
 			break;
 		}
 		case 4: //스택 
