@@ -55,7 +55,7 @@ APlayerCharacter::APlayerCharacter()
 	SetCanBeDamaged(true);
 
 	//UI asset 블루프린트 가져오기
-		//UI hpbar
+	//UI hpbar
 	m_HPBar = CreateDefaultSubobject<UWidgetComponent>(TEXT("HPBar"));
 	m_HPBar->SetupAttachment(GetMesh());
 
@@ -100,7 +100,7 @@ APlayerCharacter::APlayerCharacter()
 
 	//Dash
 	m_CanDash = true;
-	m_DashDistance = 4000.f;
+	m_DashDistance = 3000.f;
 	m_DashCooldown = 1.f; //대쉬 쿨타임
 	m_DashStop = 0.3f;
 	m_DashFov = 0;		  //대쉬 시작 1 대쉬 끝 2 (fov보간을 위한)
@@ -125,8 +125,6 @@ void APlayerCharacter::BeginPlay()
 	*/
 	m_AnimInstance = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 
-
-
 	AchuchuGameModeBase* GameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
 
 	if (IsValid(GameMode))
@@ -140,12 +138,6 @@ void APlayerCharacter::BeginPlay()
 			if (IsValid(CharacterHUD))
 			{
 				CharacterHUD->SetDelegate<APlayerCharacter>(this, &APlayerCharacter::CharacterHUDNameWidgetCallback);
-
-				//내거 characterhud ui가 먼저 불려서 여기서 이름set해도 안됨 characterhud ui클래스에서 인스턴스 불러스 해줌
-				//const FString playername = GameInst->GetPlayerInfoName();
-				//m_PlayerInfo.Name
-				//CharacterHUD->SetInputName(playername);
-
 			}
 		}
 	}
@@ -153,7 +145,6 @@ void APlayerCharacter::BeginPlay()
 	m_Capture->ShowOnlyActors.Add(this); //카메라에서 사진 찍어서 렌더타겟에 저장
 
 	LOGSTRING(TestString);
-
 }
 
 // Called every frame
@@ -161,7 +152,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	
+#if ENABLE_DRAW_DEBUG
 	EPlayerAnimType a = m_AnimInstance->GetAnimType();
 	if (a != EPlayerAnimType::Ground)
 	{
@@ -169,13 +160,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 		LOGSTRING(GetEnumToString(a));
 		//PrintViewport(1.5f, FColor::Red, t);
 	}
+#endif
 	
-	//대쉬 - 카메라 효과
+	// =================
+	// 대쉬 - 카메라 효과
+	// =================
 	if (1 == m_DashFov) 
 	{
 		//카메라
 		float CameraFov = m_Camera->FieldOfView;
-
 		float alpha = DeltaTime * m_FovSpeed;
 		float RetValue = FMath::Lerp(CameraFov, m_TargetFov, alpha);
 
@@ -192,18 +185,17 @@ void APlayerCharacter::Tick(float DeltaTime)
 		m_Camera->FieldOfView = RetValue;
 	}
 
-	
-	//Trail이 회전할 때 나오지 않도록 !! 
-	if (GetCharacterMovement()->Velocity.Size() > 0.f)
+	// =================
+	// Trail effect
+	// =================
+	if (GetCharacterMovement()->Velocity.Size() > 0.f) 	//Trail이 회전할 때 나오지 않도록 !! 
 	{
 		m_Trail->SetEmitterEnable(TEXT("Trail"), true);
 	}
-
 	else
 	{
 		m_Trail->SetEmitterEnable(TEXT("Trail"), false);
 	}
-
 
 	//고스트 트레일 생성
 	if (m_OnGhostTrail || m_ActionGhostTrail)
@@ -226,7 +218,14 @@ void APlayerCharacter::Tick(float DeltaTime)
 			Trail->CopyAnimation(GetMesh()); //스켈레톤의 현재 재생중인 포즈를 가지고 온다
 		}
 	}
-	
+
+	// ============
+	// InputMove
+	// ============
+	if (m_Attacking)
+	{
+		AddMovementInput(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.f).GetSafeNormal(), 0.2,true);
+	}
 }
 
 // Called to bind functionality to input
@@ -251,10 +250,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Attack"), EInputEvent::IE_Pressed, this, &APlayerCharacter::AttackKey);
 	PlayerInputComponent->BindAction(TEXT("Skill1"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill1Key);
 	PlayerInputComponent->BindAction(TEXT("Skill2"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill2Key);
-
 	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill3Key);
 	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Released, this, &APlayerCharacter::Skill3KeyReleased);
-
 	PlayerInputComponent->BindAction(TEXT("Skill4"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill4Key);
 }
 
@@ -373,31 +370,24 @@ void APlayerCharacter::CameraLookUpKey(float Scale)
 
 	else if (Rot.Pitch < -45.f)
 		Rot.Pitch = -45.f;
-
-	//로그 출력 가능
-	//LOG(TEXT("Attack :%d"), Scale);
-	//LOG(TEXT("TestAttack"));
-	//PrintViewport(1.f, FColor::Red, FString::Printf(TEXT("X : %.5f Y : %.5f"), Scale, Rot.Pitch));
-
 	m_Arm->SetRelativeRotation(Rot);
 } 
+
 void APlayerCharacter::CameraLookLRKey(float Scale)
 {
 	FRotator Rot = m_Arm->GetRelativeRotation();
 	Rot.Yaw += Scale * 100.f * GetWorld()->GetDeltaSeconds();
-	//Rot.Roll -= Scale * 100.f * GetWorld()->GetDeltaSeconds();
 	m_Arm->SetRelativeRotation(Rot);
 }
+
 void APlayerCharacter::JumpKey()
 {
 	if (m_Death)
 		return;
 
-
 	if (m_AnimInstance->GetAnimType() == EPlayerAnimType::Ground)
 	{
 		Jump(); //언리얼에서 점프 기능을 제공함 
-
 		m_AnimInstance->ChangeAnimType(EPlayerAnimType::Jump);
 	}
 }
@@ -408,6 +398,7 @@ void APlayerCharacter::AttackKey()
 	if (m_AttackEnable)
 	{
 		m_AttackEnable = false; //어택 키가 한번 들어오는 순간 공격 상태가 아니게 된다 중복 막는것 
+		m_Attacking = true; //공격중인가?
 		m_AnimInstance->SetAttackEnable(true);
 		Attack();
 	}
@@ -561,8 +552,8 @@ float APlayerCharacter::TakeDamage(float DamageAmount,struct FDamageEvent const&
 	*/
 
 	//카메라 쉐이트
-	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(
-		UHitCameraShake::StaticClass());
+	//GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(UHitCameraShake::StaticClass());
+	ShakeCamera();
 
 	return Damage;
 }
@@ -573,8 +564,6 @@ void APlayerCharacter::NameWidgetCallback()
 	UchuchuGameInstance* GameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
 	const FString playername = GameInst->GetPlayerInfoName();
 	m_HPBarWidget->SetName(playername);
-	
-	//m_HPBarWidget->SetName(m_PlayerInfo.Name); //선생님
 }
 
 void APlayerCharacter::CharacterHUDNameWidgetCallback()
@@ -595,14 +584,22 @@ void APlayerCharacter::CharacterHUDNameWidgetCallback()
 				UchuchuGameInstance* GameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
 				const FString playername = GameInst->GetPlayerInfoName();
 				CharacterHUD->SetName(playername);
-				
-				//선생님
-				//CharacterHUD->SetName(m_PlayerInfo.Name);
 			}
 		}
 	}
 }
 
+void APlayerCharacter::ShakeCamera()
+{
+	//카메라 쉐이트
+	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(UHitCameraShake::StaticClass());
+	
+}
+
+void APlayerCharacter::TimeDilation(float _Time)
+{
+	GetWorldSettings()->SetTimeDilation(_Time);
+}
 
 
 void APlayerCharacter::PlayFallRecovery()
@@ -661,6 +658,7 @@ void APlayerCharacter::NormalAttack() {}
 void APlayerCharacter::AttackEnd()
 {
 	m_AttackEnable = true;
+	m_Attacking = false; //공격중인가?
 }
 void APlayerCharacter::UseSkill() {}
 void APlayerCharacter::UseSkill(int32 Index) {}

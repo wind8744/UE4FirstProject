@@ -22,7 +22,8 @@ void UPlayerAnim::NativeInitializeAnimation() //초기화 될 때
 }
 
 void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds) //프레임마다 호출되는 함수
-{Super::NativeUpdateAnimation(DeltaSeconds);
+{	
+	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
 
@@ -243,4 +244,23 @@ void UPlayerAnim::AnimNotify_LoopStart()
 
 	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
 	Player->Skill3Loop();
+}
+
+void UPlayerAnim::AnimNotify_Skill2Shake()
+{
+	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
+	Player->ShakeCamera();
+}
+
+void UPlayerAnim:: AnimNotify_TimeDelayStart()
+{
+	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
+	Player->TimeDilation(0.2f);
+	// ++ 카메라 확대 및 이동? 그런것도 추가하면 좋을것 같음
+}
+
+void UPlayerAnim::AnimNotify_TimeDelayEnd()
+{
+	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
+	Player->TimeDilation(1.f);
 }

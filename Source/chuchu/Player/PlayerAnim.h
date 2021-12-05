@@ -128,11 +128,21 @@ public:
 	// ghost lady ~ skill start , end
 	
 	UFUNCTION()
-		void AnimNotify_SkillStart();
+		void AnimNotify_SkillStart();     // 모든 스킬 공통 ~
+									      
+	UFUNCTION()						      
+		void AnimNotify_SkillEnd();       // 모든 스킬 공통 ~
 
 	UFUNCTION()
-		void AnimNotify_SkillEnd();
+		void AnimNotify_Skill2Shake();    // skill2 카메라 쉐이크 이펙트
+
+	UFUNCTION()						      
+		void AnimNotify_LoopStart();      // skill3 키다운 몽타주 루프
 
 	UFUNCTION()
-		void AnimNotify_LoopStart();
+		void AnimNotify_TimeDelayStart(); // skill4 카메라 쉐이크 이펙트
+
+	UFUNCTION()
+		void AnimNotify_TimeDelayEnd();   // skill4 카메라 쉐이크 이펙트
+
 };

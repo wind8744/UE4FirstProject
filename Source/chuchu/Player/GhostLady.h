@@ -63,16 +63,18 @@ public:
 	float				m_Skill2CoolTime;
 	FTimerHandle		m_Skill2Handle;
 
-	//hp bar
+	//스킬3 키다운 위젯
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UWidgetComponent* m_CoolTimebarWidget;
 
-	class UCoolTimeBar* m_CoolTimebar;
-	bool			    m_StartTimer;
-	bool				m_Skill3Enable;
-	float				m_Skill3CoolTime;
-	float				m_SKill3AccTime;
-	FTimerHandle		m_Skill3Handle;
+	class UCoolTimeBar* m_CoolTimebar;			//위젯
+	bool			    m_StartTimer;			//키다운 시간 측정 시작
+	bool				m_Skill3Enable;			//스킬3 Max데미지
+	float				m_Skill3CoolTime;		//키다운 시간
+	float				m_SKill3AccTime;		//누적시간
+	float				m_Skill3Distance;		//스킬3 이동거리 1200
+	float				m_Skill3InitTime;		//스킬3 init함수 호출 쿨타임 1.f
+	FTimerHandle		m_SkillFovInitHandle;			//스킬3 타이머 핸들
 
 protected:
 	// Called when the game starts or when spawned
@@ -96,7 +98,7 @@ protected:
 
 	//타이머 호출
 	void InitSkill2();
-	void EnableSkill3();
+	void InitLaunchGhostLady();
 
 public:
 	// Anim 호출
@@ -107,16 +109,19 @@ public:
 
 	//skill
 	virtual void Skill3Loop();
-
-	// equip
-	void InitWeaponSocket(); //무기 탈착 시 애니메이션 , 소켓 초기화
-
+	
 	virtual void EquipItem(EEquipType EquipmentType, const FString& EquipmentPath); //아이템 장착
 	virtual void RemoveItem(EEquipType EquipmentType);
 	virtual void UseItem(); //아이템 냠냠
 
+protected:
+	// equip
+	void InitWeaponSocket(); //무기 탈착 시 애니메이션 , 소켓 초기화
 
+	//skill effect
+	void LaunchGhostLady(const FVector _launchVelocity, float _distance, float _initTime, bool _FrictionFactor = true);
 
+public:
 	UFUNCTION()
 		void OnComponentBeginOverlapWeapon(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

@@ -4,6 +4,7 @@
 #include "GhostLady.h"
 #include "PlayerAnim.h"
 #include "../Effect/NormalEffect.h"
+#include "../Effect/HitCameraShake.h"
 #include "Weapon.h"
 #include "../Effect/GhostTrail.h"
 #include "../Monster/Monster.h"
@@ -173,7 +174,11 @@ AGhostLady::AGhostLady()
 	m_Skill3Enable = false;
 	m_Skill3CoolTime = 1.5f;
 	m_SKill3AccTime = 0.f;
+	m_Skill3Distance = 1200.f;
+	m_Skill3InitTime = 1.f;
 
+
+	
 	// ==========
 	// PlayerInfo
 	// ==========
@@ -309,6 +314,12 @@ void AGhostLady::NormalAttack()
 	//캡슐충돌
 	//========
 	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //공격이 시작될 때 콜리전 활성화
+
+	//===========
+	// 캐릭터 발사
+	//===========
+	//LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.f), 500.f, 0.3f);
+
 }
 
 void AGhostLady::AttackEnd()
@@ -442,13 +453,15 @@ void AGhostLady::Skill2()
 	}
 }
 
-void AGhostLady::InitSkill2() //타이머 호출
+void AGhostLady::InitSkill2() //쿨타임 이후 타이머 호출
 {
 	m_Skill2Enable = true;
 }
 
 void AGhostLady::Skill3()
 {
+	m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+
 	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[4]))
 	{
 		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[4], 0.f);
@@ -456,14 +469,8 @@ void AGhostLady::Skill3()
 		
 		m_StartTimer = true;
 		m_CoolTimebarWidget->ToggleVisibility();
-		//GetWorldTimerManager().SetTimer(m_Skill3Handle, this, &AGhostLady::EnableSkill3, m_Skill3CoolTime, false); //dashstop시간 이후 함수 호출
 	}
 }
-
-//void AGhostLady::EnableSkill3() //타이머 호출, 키다운 쿨타임 이후 공격 가능하도록 불림
-//{
-//	m_Skill3Enable = true;
-//}
 
 void AGhostLady::Skill3Loop()
 {
@@ -494,29 +501,42 @@ void AGhostLady::Skill4()
 void AGhostLady::UseSkill()
 {
 	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //공격이 시작될 때 콜리전 활성화
+	m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
 
 	switch (m_PushedSkillIdx)
 	{
+
 		case 1:
 		{
-			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+			// 캐릭터 발사
+			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.f), 1000.f, 0.8f);
+
+			//카메라 Fov effect
+			m_DashFov = 1;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &APlayerCharacter::StopDashing, m_DashStop, false);
 
 			break;
 		}
-		case 2: //재사용 대기시간
+		case 2:
 		{
-			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
-			LaunchCharacter(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.5f).GetSafeNormal() * 1000.f, true, true);//카메라 위아래로 움직짐 방지, 지
-			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); //dashstop시간 이후 함수 호출
+			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.9f), 500.f, 1.f,false);
 
 			m_Skill2Enable = false;
 
+			//재사용 대기시간
+			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); 
+
 			break;
 		}
-		case 3: //키다운
+		case 3: //키다운 공격
 		{
-			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
-			
+			// 캐릭터 발사
+			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.f), m_Skill3Distance, m_Skill3InitTime);
+
+			//카메라 Fov effect
+			m_DashFov =1;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &APlayerCharacter::StopDashing, m_DashStop, false); 
+
 			if (m_Skill3Enable)
 			{
 				//최대 대미지
@@ -530,13 +550,35 @@ void AGhostLady::UseSkill()
 
 			break;
 		}
-		case 4: //스택 
+		case 4: //스택 or 커맨드?
 		{
-			m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
+			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.f ,false);
+
 			break;
 		}
 		default:
 			break;
 	}
 
+}
+
+void AGhostLady::LaunchGhostLady(const FVector _launchVelocity, float _distance,float _initTime, bool _FrictionFactor)
+{
+	if (_FrictionFactor)
+	{
+		GetCharacterMovement()->BrakingFrictionFactor = 0.f; //마찰력을 0으로 설정, 땅에 닿을때 속도가 느려지는 것을 방지하기 위함
+		LaunchCharacter(FVector(_launchVelocity.X, _launchVelocity.Y, _launchVelocity.Z).GetSafeNormal() * _distance, true, true);
+		GetWorldTimerManager().SetTimer(m_SkillFovInitHandle, this, &AGhostLady::InitLaunchGhostLady, _initTime, false); //_initTime시간 이후 함수 호출
+	}
+	else
+	{
+		LaunchCharacter(FVector(_launchVelocity.X, _launchVelocity.Y, _launchVelocity.Z).GetSafeNormal() * _distance, true, true);
+		GetWorldTimerManager().SetTimer(m_SkillFovInitHandle, this, &AGhostLady::InitLaunchGhostLady, _initTime, false);
+	}
+}
+
+void AGhostLady::InitLaunchGhostLady()
+{
+	GetCharacterMovement()->StopMovementImmediately(); //이동 중지 호출
+	GetCharacterMovement()->BrakingFrictionFactor = 2.f; //마찰력 초기화
 }

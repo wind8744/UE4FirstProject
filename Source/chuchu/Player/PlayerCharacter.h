@@ -70,6 +70,7 @@ protected:
 
 	bool				m_MoveKey;
 	bool				m_AttackEnable; //공격 가능상태인지 아닌지
+	bool				m_Attacking;    //공격중인지 아닌지
 	bool				m_Death;
 
 	class UPlayerAnim* m_AnimInstance;
@@ -100,6 +101,14 @@ protected:
 	virtual void EquipItem(EEquipType EquipmentType, const FString& EquipmentPath); //아이템 장착
 	virtual void RemoveItem(EEquipType EquipmentType); //아이템 해제
 	virtual void UseItem(); //아이템 냠냠
+
+
+	//test
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float m_test;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		float m_test2;
+
 
 public:
 	const FPlayerInfo& GetPlayerInfo()	const
@@ -179,6 +188,9 @@ public:
 
 	void StopDashing();
 	void ResetDash();
+
+	void ShakeCamera();
+	void TimeDilation(float _Time);
 
 	virtual void ChangeWeaponSocket();
 public:
