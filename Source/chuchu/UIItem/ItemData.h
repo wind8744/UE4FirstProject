@@ -100,5 +100,5 @@ public:
 		m_Index = Index;
 	}
 
-	void Use(class APlayerCharacter* character); //virtual
+	void Use(class APlayerCharacter* character); //virtual (class AGhostLady* character);
 };

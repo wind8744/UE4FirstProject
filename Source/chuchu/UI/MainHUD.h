@@ -7,6 +7,7 @@
 #include "MainMenuWidget.h"
 #include "InventoryList.h"
 #include "InventoryTile.h"
+#include "MainMenuSkillWidget.h"
 #include"../UIItem/Inventory.h"
 #include "../UIEquipment/Equipment.h"
 #include "AuctionWidget.h"
@@ -24,16 +25,13 @@ class CHUCHU_API UMainHUD : public UUserWidget
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UCharacterHUD* m_CharacterHUD;
+		UCharacterHUD* m_CharacterHUD;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UMainMenuWidget* m_MainMenu;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UInventoryList* m_InventoryList;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UInventoryTile* m_InventoryTile;
+		UMainMenuSkillWidget* m_MainMenuSkill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UAuctionWidget* m_Auction;
@@ -63,13 +61,15 @@ public:
 		return m_MainMenu;
 	}
 
-	UInventoryList* GetInventoryList()
-	{
-		return m_InventoryList;
-	}
+	//UInventoryList* GetInventoryList()
+	//{
+	//	return m_InventoryList;
+	//}
 
 	UInventory* GetInventory() { return m_Inventory; }
 	UEquipment* GetEquipment() { return m_Equipment; }
+
+	void PopupUI(); //MainPlayerController에서 호출
 
 protected:
 	virtual void NativeConstruct(); //생성 ( 소멸도 있음 )

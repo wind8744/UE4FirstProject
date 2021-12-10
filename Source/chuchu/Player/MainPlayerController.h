@@ -23,6 +23,7 @@ private:
 
 	bool m_MouseClicked;
 	bool m_MouseOn;
+	bool m_IsUIMode;
 
 public:
 	virtual void PlayerTick(float DeltaTime);
@@ -32,6 +33,7 @@ private:
 	void MouseClick();
 	void MouseReleased();
 	void PickingItem();
+	void UIKey();
 
 public:
 	bool IsMouseOn() { return m_MouseOn; }

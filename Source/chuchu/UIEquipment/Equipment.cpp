@@ -2,8 +2,9 @@
 
 
 #include "Equipment.h"
+#include "../UIItem/Inventory.h"
 #include "Components/CanvasPanelSlot.h"
-
+#include "../Player/MainPlayerController.h"
 
 void UEquipment::NativeConstruct()
 {
@@ -40,11 +41,30 @@ void UEquipment::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UEquipment::CloseButtonClick()
 {
-	if (GetVisibility() == ESlateVisibility::Collapsed) 
-		SetVisibility(ESlateVisibility::SelfHitTestInvisible); 
+	if (GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
+		SetVisibility(ESlateVisibility::SelfHitTestInvisible); //인벤토리가 보이도록
 
 	else
+	{
 		SetVisibility(ESlateVisibility::Collapsed);
+
+		m_Inventoryclass->CloseInvenUI();
+		APlayerController* PController = GetWorld()->GetFirstPlayerController();
+		PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
+		PController->bShowMouseCursor = false;
+	}
+}
+
+void UEquipment::CloseEquipUI()
+{
+	if (GetVisibility() == ESlateVisibility::Collapsed)
+	{
+		SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	}
+	else
+	{
+		SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UEquipment::InitEquipment()

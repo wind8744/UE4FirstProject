@@ -183,10 +183,12 @@ float AMonster::TakeDamage(float DamageAmount,struct FDamageEvent const& DamageE
 				FBox dropbox(GetMesh()->GetComponentLocation() - FVector(50.f, 50.f, -50.f), GetMesh()->GetComponentLocation() + FVector(50.f, 50.f, 100.f)); //Min, Max
 
 				AItemBox* Itembox = GetWorld()->SpawnActor<AItemBox>(AItemBox::StaticClass(), FMath::RandPointInBox(dropbox), GetMesh()->GetComponentRotation(), itemparam);
-
-				Itembox->SetMesh(iteminfo->m_PickMesh);
-				Itembox->SetItemName(iteminfo->m_ItemName);
-				PrintViewport(10.f, FColor::Blue, FString::Printf(TEXT("Dropitem : %s"), *iteminfo->m_ItemName));
+				if (Itembox)
+				{
+					Itembox->SetMesh(iteminfo->m_PickMesh);
+					Itembox->SetItemName(iteminfo->m_ItemName);
+					PrintViewport(10.f, FColor::Blue, FString::Printf(TEXT("Dropitem : %s"), *iteminfo->m_ItemName));
+				}
 
 			}
 		}

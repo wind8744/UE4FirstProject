@@ -14,10 +14,9 @@ void UMainHUD::NativeConstruct()
 	m_MainMenu = Cast<UMainMenuWidget>(GetWidgetFromName(TEXT("UI_MainMenu")));
 	m_Inventory = Cast<UInventory>(GetWidgetFromName(TEXT("UI_Inventory")));
 	m_Equipment = Cast<UEquipment>(GetWidgetFromName(TEXT("UI_Equipment")));
-
-	//뺄것들
-	m_InventoryList = Cast<UInventoryList>(GetWidgetFromName(TEXT("UI_InventoryList")));
-	m_InventoryTile = Cast<UInventoryTile>(GetWidgetFromName(TEXT("UI_InventoryTile")));
+	m_MainMenuSkill = Cast<UMainMenuSkillWidget>(GetWidgetFromName(TEXT("UI_MainMenuSkill")));
+	
+	//test
 	m_Auction = Cast<UAuctionWidget>(GetWidgetFromName(TEXT("UI_AuctionWidget")));
 	m_LandScapeSlider = Cast<USlider>(GetWidgetFromName(TEXT("LandScapeTiling")));
 
@@ -27,26 +26,23 @@ void UMainHUD::NativeConstruct()
 	m_LandScapeSlider->OnValueChanged.AddDynamic(this, &UMainHUD::LandScapeSliderValue);
 
 
-	m_LandScapeCollection = LoadObject<UMaterialParameterCollection>(GetWorld(),
-		TEXT("MaterialParameterCollection'/Game/LandScape/MCMainLandScapeData.MCMainLandScapeData'"));
+	m_LandScapeCollection = LoadObject<UMaterialParameterCollection>(GetWorld(), TEXT("MaterialParameterCollection'/Game/LandScape/MCMainLandScapeData.MCMainLandScapeData'"));
 
 	//인스턴스 만드는 방법 , 인스턴스 객체를 하나 만들어줌, 실제로 값을 컨트롤 하는 것은 인스턴트가 해줌
 	m_LandScapeCollectionInst = GetWorld()->GetParameterCollectionInstance(m_LandScapeCollection);
 
-	m_MainMenu->SetInventoryList(m_InventoryList);
-	m_MainMenu->SetInventoryTile(m_InventoryTile);
+	//m_MainMenu->SetInventoryList(m_InventoryList);
+	//m_MainMenu->SetInventoryTile(m_InventoryTile);
 	m_MainMenu->SetAuction(m_Auction);
 
 	//실제로 쓴느것
 	m_MainMenu->SetInventory(m_Inventory);
 	m_MainMenu->SetEquipment(m_Equipment);
 
-
 	/*m_MainMenu->SetInventoryButtonClickCallback<UMainHUD>(this,
 		&UMainHUD::InventoryButtonClick);*/
 
-
-	//test
+	//장비창과 인벤토리에 서로의 주소값 세팅
 	m_Inventory->SetEquipClass(m_Equipment);
 	m_Equipment->SetInventoryClass(m_Inventory);
 	m_Equipment->InitEquipment();
@@ -62,4 +58,19 @@ void UMainHUD::LandScapeSliderValue(float Value)
 	//제대로 되는건지 아닌지 불값으로 리턴해줌 
 	//들어온 값(슬라이더로 조절한 값)을 랜드스캐이프 데이타의 타일링 data값에 set
 	bool Find = m_LandScapeCollectionInst->SetScalarParameterValue(TEXT("Tiling"), Value);
+}
+
+void UMainHUD::PopupUI()
+{
+	if (m_Equipment->GetVisibility() == ESlateVisibility::Collapsed)
+		m_Equipment->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	else
+		m_Equipment->SetVisibility(ESlateVisibility::Collapsed);
+
+	if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed)
+		m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	else
+		m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
 }

@@ -75,5 +75,6 @@ public:
 
 	UFUNCTION()
 		void CloseButtonClick();
+	void CloseInvenUI(); //장비창에서 창 닫을때
 	
 };

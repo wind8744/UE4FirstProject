@@ -53,7 +53,7 @@ void AGhostTrail::Tick(float DeltaTime)
 		{
 			m_FadeTimeAcc += DeltaTime;
 
-			float	Opacity = 1.f - m_FadeTimeAcc / m_FadeTime; //투명도는 곱해지므로 시간이 더 지날수록 투명도가 커지는 
+			float Opacity = 1.f - m_FadeTimeAcc / m_FadeTime; //투명도는 곱해지므로 시간이 더 지날수록 투명도가 커지는 
 
 			for (auto& Mtrl : m_GhostMaterialArray)
 			{

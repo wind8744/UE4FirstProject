@@ -256,6 +256,7 @@ void UPlayerAnim:: AnimNotify_TimeDelayStart()
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
 	Player->TimeDilation(0.2f);
+	// Ghost Trail On
 	// ++ 카메라 확대 및 이동? 그런것도 추가하면 좋을것 같음
 }
 

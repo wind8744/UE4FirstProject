@@ -31,9 +31,11 @@ AItemBox::AItemBox()
 	// 외곽선 렌더링
 	m_ItemMesh->bRenderCustomDepth = true; //뎁스 스텐실 사용 체크
 	m_ItemMesh->CustomDepthStencilWriteMask = ERendererStencilMask::ERSM_Default; //스텐실 버퍼 : 디폴트
-	m_ItemMesh->SetCustomDepthStencilValue(255);
+	//m_ItemMesh->SetCustomDepthStencilValue(255); //외각선 off
+	m_ItemMesh->SetCustomDepthStencilValue(1);
 	
 	m_ItemOutline = false;
+
 }
 
 // Called when the game starts or when spawned
@@ -41,7 +43,10 @@ void AItemBox::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//m_ItemBox->OnComponentBeginOverlap.AddDynamic(this, &AItemBox::ItemBeginOverlap); // 간간히 터짐, 이유는 모름
+	//m_ItemBox->OnComponentEndOverlap.AddDynamic(this, &AItemBox::ItemEndOverlap);
+	
+	m_ItemBox->OnComponentBeginOverlap.AddDynamic(this, &AItemBox::ItemBeginOverlap); // --> 안됨
+	
 	// 델리게이트로 실행할 함수를 선언하고 바인딩해준다.
 	// 함수명은 자유롭게 해도 되지만, 매개변수를 정확히 써줘야 컴파일이 된다.
 	// PrimitiveComponent.h 145줄에 선언되어있음
@@ -53,6 +58,8 @@ void AItemBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/*
+	* //if item clicked
 	if (m_ItemOutline)
 	{
 		AMainPlayerController* playercontroller = Cast<AMainPlayerController>(GetWorld()->GetFirstPlayerController());
@@ -65,9 +72,72 @@ void AItemBox::Tick(float DeltaTime)
 			}
 		}
 	}
+	*/
+}
+#include "../Player/PlayerCharacter.h"
+// 플레이어와 충돌되었을 때 이벤트가 발생되는 함수 --> 안됨
+// 상자의 크기가 커서 완전히 생성되기 전 다른 어떤것과 충돌처리 되어 Destroy함수가 불려 몬스터에서 스폰했을 ㄸㅐ nullptr이 뜨는 것
+// 
+void AItemBox::ItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//if (!OverlapCom->GetOwner()->IsA(APlayerCharacter::StaticClass()))
+	APlayerCharacter* InPlayer = Cast<APlayerCharacter>(OtherActor);
+	if (InPlayer)
+	{
+		UchuchuGameInstance* gameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
+		if (gameInst)
+		{
+			const FUIItemDataInfo* ItemInfo = gameInst->FindUIItemInfo(m_ItemName);
+			if (ItemInfo)
+			{
+				UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
+				ItemData->SetNameText(ItemInfo->m_ItemName);
+				ItemData->SetIconTex(ItemInfo->m_Thumbnail); 
+				ItemData->SetItemType(EItemType::Equip, EEquipType::WEAPON);
+				ItemData->SetIndex(0); //?
+				ItemData->SetPickMesh(ItemInfo->m_PickMesh);
+
+				AchuchuGameModeBase* gameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+				if (gameMode)
+				{
+					gameMode->GetMainHUD()->GetInventory()->AddItem(ItemData);
+				}
+			}
+
+		}
+		Destroy();
+	}
 
 }
 
+
+void AItemBox::ItemEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	UchuchuGameInstance* gameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
+	if (gameInst)
+	{
+		const FUIItemDataInfo* ItemInfo = gameInst->FindUIItemInfo(m_ItemName);
+		if (ItemInfo)
+		{
+			UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
+			ItemData->SetNameText(ItemInfo->m_ItemName);
+			ItemData->SetIconTex(ItemInfo->m_Thumbnail);
+			ItemData->SetItemType(EItemType::Equip, EEquipType::WEAPON);
+			ItemData->SetIndex(0); //?
+			ItemData->SetPickMesh(ItemInfo->m_PickMesh);
+
+			AchuchuGameModeBase* gameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+			if (gameMode)
+			{
+				gameMode->GetMainHUD()->GetInventory()->AddItem(ItemData);
+			}
+		}
+
+	}
+	Destroy();
+}
+
+//if click item, pick item
 void AItemBox::ItemClicked()
 {
 	UchuchuGameInstance* gameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
@@ -94,7 +164,7 @@ void AItemBox::ItemClicked()
 	Destroy();
 }
 
-void AItemBox:: ItemOutLineOn()
+void AItemBox::ItemOutLineOn()
 {
 	m_ItemMesh->SetCustomDepthStencilValue(1);
 	m_ItemOutline = true;
@@ -104,37 +174,3 @@ void AItemBox::ItemOutLineOff()
 {
 	m_ItemOutline = false;
 }
-
-
-/* 	// 플레이어와 충돌되었을 때 이벤트가 발생되는 함수,  간간히 터짐, 이유는 모름
-*  1. 매개변수 이름을 정확히 쓰지 않아서
-*  2. 게임 인스턴스나 게임 모드 베이스를 마구잡이로 불러와서는 안됨.. 가끔 널이 불려짐.
-void AItemBox::ItemBeginOverlap(UPrimitiveComponent* OverlapCom, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	UchuchuGameInstance* gameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
-	if (gameInst)
-	{
-		const FUIItemDataInfo* ItemInfo = gameInst->FindUIItemInfo(m_ItemName);
-		if (ItemInfo)
-		{
-			UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
-			ItemData->SetNameText(ItemInfo->m_ItemName);
-			ItemData->SetIconTex(ItemInfo->m_Thumbnail);
-			//ItemData->SetItemtype(ItemInfo->ItemType, ItemInfo->m_EquipType);
-			ItemData->SetItemType(EItemType::Equip, EEquipType::WEAPON);
-			ItemData->SetIndex(0); //?
-			ItemData->SetPickMesh(ItemInfo->m_PickMesh);   //ItemData->SetMeshPath(TEXT("StaticMesh'/Game/GreatSword/GreatSword/Weapon/GreatSword_02.GreatSword_02'")
-			//m_InventoryTile->AddItem(ItemData);
-			//Items.Add(Data2);
-
-			AchuchuGameModeBase* gameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
-			if (gameMode)
-			{
-				gameMode->GetMainHUD()->GetInventory()->AddItem(ItemData);
-			}
-		}
-
-	}
-	Destroy();
-}
-*/

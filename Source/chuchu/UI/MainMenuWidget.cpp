@@ -11,17 +11,19 @@ void UMainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	m_InventoryButton = Cast<UButton>(GetWidgetFromName(TEXT("InventoryButton"))); //인벤토리버튼
-	m_CharacterStateButton = Cast<UButton>(GetWidgetFromName(TEXT("CharacterStateButton")));
+	//m_InventoryButton = Cast<UButton>(GetWidgetFromName(TEXT("InventoryButton"))); //인벤토리버튼
+	//m_CharacterStateButton = Cast<UButton>(GetWidgetFromName(TEXT("CharacterStateButton")));
 	m_SkillButton = Cast<UButton>(GetWidgetFromName(TEXT("SkillButton")));
 	m_OptionButton = Cast<UButton>(GetWidgetFromName(TEXT("OptionButton")));
 
-	m_InventoryButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory); //인벤토리 버튼이 눌릴때 onInventory함수가 호출
-	m_CharacterStateButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventoryTile); //
+	//m_InventoryButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory); //인벤토리 버튼이 눌릴때 onInventory함수가 호출
+	//m_CharacterStateButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventoryTile); //
 
 	// 실제로 쓰는것
-	m_SkillButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnAuction);
+	m_SkillButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnEquipment);
 	m_OptionButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory2);
+
+
 }
 
 void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -29,6 +31,25 @@ void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
+void UMainMenuWidget::OnEquipment()
+{
+	if (m_Equipment->GetVisibility() == ESlateVisibility::Collapsed)
+		m_Equipment->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	else
+		m_Equipment->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UMainMenuWidget::OnInventory2()
+{
+	if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed)
+		m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	else
+		m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+/*
 void UMainMenuWidget::OnInventory() //인벤토리 버튼이 눌릴때 onInventory함수가 호출
 {
 	if (m_InventoryList->GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
@@ -54,29 +75,4 @@ void UMainMenuWidget::OnInventoryTile()
 	else
 		m_InventoryTile->SetVisibility(ESlateVisibility::Collapsed);
 }
-
-void UMainMenuWidget::OnAuction()
-{
-	/*
-	if (m_Auction->GetVisibility() == ESlateVisibility::Collapsed)
-		m_Auction->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_Auction->SetVisibility(ESlateVisibility::Collapsed);
-	*/
-	
-	if (m_Equipment->GetVisibility() == ESlateVisibility::Collapsed)
-		m_Equipment->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_Equipment->SetVisibility(ESlateVisibility::Collapsed);
-}
-
-void UMainMenuWidget::OnInventory2()
-{
-	if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed)
-		m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
-}
+*/

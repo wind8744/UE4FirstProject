@@ -5,7 +5,8 @@
 #include "../chuchuGameInstance.h"
 #include "../chuchuGameModeBase.h"
 #include "../UIEquipment/Equipment.h"
-
+#include "../Player/MainPlayerController.h"
+#include "../Player/PlayerCharacter.h"
 
 void UInventory::NativeConstruct()
 {
@@ -170,13 +171,33 @@ void UInventory::ItemHOvered(UObject* Data, bool Hovered)
 
 }
 
+
 void UInventory::CloseButtonClick()
 {
 	if (GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
 		SetVisibility(ESlateVisibility::SelfHitTestInvisible); //인벤토리가 보이도록
 
 	else
+	{
 		SetVisibility(ESlateVisibility::Collapsed);
+
+		m_Equipclass->CloseEquipUI();
+
+		APlayerController* PController = GetWorld()->GetFirstPlayerController();
+		PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
+		PController->bShowMouseCursor = false;
+	}
+}
+
+void UInventory::CloseInvenUI()
+{
+	if (GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
+		SetVisibility(ESlateVisibility::SelfHitTestInvisible); //인벤토리가 보이도록
+
+	else
+	{
+		SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 bool UInventory::AddItem(UObject* Item)

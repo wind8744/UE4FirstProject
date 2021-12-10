@@ -5,6 +5,9 @@
 #include "PlayerAnim.h"
 #include "../Effect/NormalEffect.h"
 #include "../Effect/HitCameraShake.h"
+
+#include "../Effect/GreystoneSkill2Decal.h"
+
 #include "Weapon.h"
 #include "../Effect/GhostTrail.h"
 #include "../Monster/Monster.h"
@@ -13,12 +16,22 @@
 AGhostLady::AGhostLady()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	//teset
+		// bp스킬1
+	static ConstructorHelpers::FClassFinder<AActor>	Skill1Class(TEXT("Blueprint'/Game/Player/GreyStone/BPGreyStoneSkill1.BPGreyStoneSkill1_C'"));
+
+	if (Skill1Class.Succeeded())
+		m_Skill1class = Skill1Class.Class;
+
+
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> 
 		GhostLadyAsset(TEXT("SkeletalMesh'/Game/GhostLady_S2/Meshes/Characters/Combines/SK_GhostLadyS2_A.SK_GhostLadyS2_A'"));
 
 	if (GhostLadyAsset.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(GhostLadyAsset.Object);
+		m_PlayerMesh = GhostLadyAsset.Object; 	// 고스트 트레일을 위한 멤변에도 메쉬 등록
 	}
 
 	// Anim Asset
@@ -246,6 +259,7 @@ void AGhostLady::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 void AGhostLady::Dash()
 {
+
 	FActorSpawnParameters	param;
 	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
@@ -332,6 +346,9 @@ void AGhostLady::AttackEnd()
 	m_SKill3AccTime = 0.f;
 	m_StartTimer = false;
 	m_Skill3Enable = false;
+	
+	if(m_OnGhostTrail)
+		GhostTrailEnd();
 }
 
 void AGhostLady::EquipItem(EEquipType EquipmentType, const FString& EquipmentPath)
@@ -436,10 +453,13 @@ void AGhostLady::InitWeaponSocket()
 }
 
 
-void AGhostLady::Skill1() // 바꾸기
+void AGhostLady::Skill1()
 {
 	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[0]))
 	{
+		// Ghost Trail On
+		OnGhostTrail();
+
 		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[0], 0.f);
 		m_AnimInstance->Montage_Play(m_SkillMontageArray[0]);
 	}
@@ -519,12 +539,11 @@ void AGhostLady::UseSkill()
 		}
 		case 2:
 		{
-			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.9f), 500.f, 1.f,false);
+			//AGreyStoneSkill1* Skill = GetWorld()->SpawnActor<AGreyStoneSkill1>(m_Skill1class,GetActorLocation() + GetActorForwardVector() * 100.f, GetActorRotation());
 
-			m_Skill2Enable = false;
-
-			//재사용 대기시간
-			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); 
+			m_Skill2Enable = false; //쿨타임 후 다시 true
+			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.2f,false);	//플레이어 점프
+			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); 			//재사용 대기시간
 
 			break;
 		}
@@ -552,7 +571,15 @@ void AGhostLady::UseSkill()
 		}
 		case 4: //스택 or 커맨드?
 		{
+
 			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.f ,false);
+
+			//동기 에셋 로딩
+			UNiagaraSystem* particlens = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/sA_StylizedSwordSet/Fx/NS_Slash_UptoDown_Lv3_2.NS_Slash_UptoDown_Lv3_2'")));
+			if (particlens)
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), particlens, GetActorLocation(),GetActorForwardVector().Rotation());
+
+			GhostLadySkill4();
 
 			break;
 		}
@@ -581,4 +608,68 @@ void AGhostLady::InitLaunchGhostLady()
 {
 	GetCharacterMovement()->StopMovementImmediately(); //이동 중지 호출
 	GetCharacterMovement()->BrakingFrictionFactor = 2.f; //마찰력 초기화
+}
+
+
+void AGhostLady::GhostLadySkill4()
+{
+	// 충돌체
+	FHitResult result2;
+	FVector	PlayerLoc = GetActorLocation();
+	FVector	Forward = GetActorForwardVector();
+
+	FCollisionQueryParams	params(NAME_None, false, this); //충돌을 위한 파라미터들 
+
+	// 근접공격으로 이 타이밍에 충돌처리를 해주도록 한다.
+	TArray<FHitResult>	HitResultArray; //t어래이 타입으로 hit결과 배열을 만들어줌 , 충돌을 한 뒤 충돌의 결과값을 저장하는 구조체
+	//impactpoint는 부딪힌 위치 normal은 부딪힌 방향 
+
+	FVector AttackBox;
+	AttackBox.X = 300.f;
+	AttackBox.Y = 300.f;
+	AttackBox.Z = 300.f;
+
+	bool Sweep = GetWorld()->SweepMultiByChannel(HitResultArray, PlayerLoc, //멅티는 여러마리 싱글은 한마리 //두번째 인자는 충돌 시작점	
+		PlayerLoc, FQuat::Identity, //공격 거리, 회전정보가 기본 
+		ECollisionChannel::ECC_GameTraceChannel3, FCollisionShape::MakeBox(AttackBox),//MakeSphere(m_PlayerInfo.AttackDistance), //engineTrace사용xxx ,
+		params);
+
+
+#if ENABLE_DRAW_DEBUG
+	PrintViewport(1.f, FColor::Yellow, TEXT("Attack"));
+	FColor	DrawColor = HitResultArray.Num() > 0 ? FColor::Red : FColor::Green;
+	DrawDebugBox(GetWorld(), PlayerLoc, AttackBox, DrawColor, false, 1.f);
+#endif
+
+
+	for (auto& result : HitResultArray)
+	{
+		FActorSpawnParameters	param;
+		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; // 부딪히던 안부딪히던 무조건 불러오도록
+
+		ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),
+			result.ImpactPoint, result.ImpactNormal.Rotation(), param); //위치정보, 회전정보(어느각도?:부딪혔을때 방향벡터의 반대방향), 방향벡터를 회전정보로 바꾸어줌, 위에서 불러온 파라미터 정보 
+
+		// 애셋을 로딩한다.
+		//동기 에셋 로딩
+		UNiagaraSystem* NSHit = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/StrikeVFX/FX/FX_AshStrike1.FX_AshStrike1'")));
+		if (NSHit)
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NSHit, result.ImpactPoint, result.ImpactNormal.Rotation());
+
+		
+
+		// Sound
+		Effect->LoadSoundAsync(TEXT("HitNormal"));
+		//Effect->LoadSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
+
+		// 데미지를 전달한다.
+		FDamageEvent	DmgEvent;
+		//최종 데미지
+		float Damage = result.GetActor()->TakeDamage(m_PlayerInfo.Attack, DmgEvent, GetController(), this);
+
+	}
+
+
+	// 밀려나기
+
 }

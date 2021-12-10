@@ -28,23 +28,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UButton* m_OptionButton;
 
-	class UInventoryList* m_InventoryList;
-	class UInventoryTile* m_InventoryTile;
-	class UAuctionWidget* m_Auction;
+	//class UInventoryList* m_InventoryList;
+	//class UInventoryTile* m_InventoryTile;
 
+	class UAuctionWidget* m_Auction;
 	class UInventory* m_Inventory;
 	class UEquipment* m_Equipment;
 
 public:
-	void SetInventoryList(class UInventoryList* List)
-	{
-		m_InventoryList = List;
-	}
+	//void SetInventoryList(class UInventoryList* List)
+	//{
+	//	m_InventoryList = List;
+	//}
 
-	void SetInventoryTile(class UInventoryTile* Tile)
-	{
-		m_InventoryTile = Tile;
-	}
+	//void SetInventoryTile(class UInventoryTile* Tile)
+	//{
+	//	m_InventoryTile = Tile;
+	//}
 		
 	void SetAuction(class UAuctionWidget* Auction)
 	{
@@ -67,15 +67,16 @@ protected:
 
 public:
 	UFUNCTION()
-		void OnInventory();
-
-	UFUNCTION()
-		void OnInventoryTile();
-
-	UFUNCTION()
-		void OnAuction();
+		void OnEquipment();
 
 	UFUNCTION()
 		void OnInventory2();
 
+	/*
+	UFUNCTION()
+		void OnInventory();
+
+	UFUNCTION()
+		void OnInventoryTile();
+	*/
 };

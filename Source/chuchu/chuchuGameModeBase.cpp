@@ -49,7 +49,6 @@ AchuchuGameModeBase::AchuchuGameModeBase()
 
 	//플레이어 메인 컨트롤러
 	PlayerControllerClass = AMainPlayerController::StaticClass();
-
 }
 
 void AchuchuGameModeBase::InitGame(const FString& MapName,

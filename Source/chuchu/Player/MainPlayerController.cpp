@@ -3,6 +3,7 @@
 
 #include "MainPlayerController.h"
 #include "PlayerCharacter.h"
+#include "../chuchuGameModeBase.h"
 #include "../UIItem/ItemBox.h"
 #include "../Environment/EnvironmentNormalActor.h"
 
@@ -15,15 +16,31 @@ AMainPlayerController::AMainPlayerController()
 	bEnableTouchOverEvents = true;
 	//m_MouseClicked = false;
 	m_MouseOn = false;
+	m_IsUIMode = false;
 }
 
 void AMainPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
+	InputComponent->BindAction(TEXT("UI"), EInputEvent::IE_Pressed, this, &AMainPlayerController::UIKey);
 	//InputComponent->BindAction(TEXT("PickItem"), EInputEvent::IE_Pressed, this, &AMainPlayerController::MouseClick);
 	//InputComponent->BindAction(TEXT("PickItem"), EInputEvent::IE_Released, this, &AMainPlayerController::MouseReleased);
 }
+
+void AMainPlayerController::UIKey()
+{
+	m_IsUIMode = m_IsUIMode == true ? false : true;
+
+	if (m_IsUIMode)
+	{
+		SetInputMode(FInputModeUIOnly());
+		bShowMouseCursor = true;
+		AchuchuGameModeBase* chuMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+		chuMode->GetMainHUD()->PopupUI();
+	}
+}
+
 
 void AMainPlayerController:: MouseClick()
 {
@@ -41,6 +58,7 @@ void AMainPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 
 	// 아이템 메쉬 외각선 처리
+	/* //마우스로 아이템 올렸을 때 외각선 처리, 마우스 없앴으므로 주석처리함 
 	FHitResult hitResult;
 	bool Hit12 = GetHitResultUnderCursor(ECollisionChannel::ECC_GameTraceChannel9, //마우스 충돌체 defaulteditor .ini에서 
 		false, hitResult);
@@ -55,6 +73,7 @@ void AMainPlayerController::PlayerTick(float DeltaTime)
 		else 
 			m_MouseOn = false;
 	}
+	*/
 
 	//건물 충돌체 가져와서 캐릭터 실루엣 보여주기 10_12강의
 	int a = 1;

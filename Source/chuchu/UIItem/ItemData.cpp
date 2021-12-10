@@ -5,6 +5,7 @@
 #include "Inventory.h"
 #include "../UIEquipment/Equipment.h"
 #include "../UIEquipment/EquipTile.h"
+#include "../Player/PlayerCharacter.h"
 #include "../Player/GhostLady.h"
 #include "../chuchuGameInstance.h"
 
@@ -13,7 +14,7 @@ UItemData::UItemData()
 
 }
 
-void UItemData::Use(class APlayerCharacter* character) 
+void UItemData::Use(class APlayerCharacter* character) //(AGhostLady* character)
 {
 	switch (m_ItemType)
 	{

@@ -218,7 +218,6 @@ void AAurora::Skill3()
 
 		// Ghost Trail On
 		//OnGhostTrail();
-
 	}
 }
 

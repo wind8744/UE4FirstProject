@@ -51,4 +51,6 @@ public:
 	UFUNCTION()
 		void CloseButtonClick();
 
+	void CloseEquipUI();
+
 };

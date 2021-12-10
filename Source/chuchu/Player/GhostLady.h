@@ -76,6 +76,9 @@ public:
 	float				m_Skill3InitTime;		//스킬3 init함수 호출 쿨타임 1.f
 	FTimerHandle		m_SkillFovInitHandle;			//스킬3 타이머 핸들
 
+	//test
+	TSubclassOf<AGreyStoneSkill1> m_Skill1class;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -120,6 +123,7 @@ protected:
 
 	//skill effect
 	void LaunchGhostLady(const FVector _launchVelocity, float _distance, float _initTime, bool _FrictionFactor = true);
+	void GhostLadySkill4();
 
 public:
 	UFUNCTION()

@@ -95,7 +95,7 @@ APlayerCharacter::APlayerCharacter()
 
 	m_OnGhostTrail = false;
 	m_ActionGhostTrail = false;
-	m_GhostTrailTime = 0.5f;
+	m_GhostTrailTime = 0.2f;
 	m_GhostTrailTimeAcc = 0.f;
 
 	//Dash
@@ -218,7 +218,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			Trail->CopyAnimation(GetMesh()); //스켈레톤의 현재 재생중인 포즈를 가지고 온다
 		}
 	}
-
+	
 	// ============
 	// InputMove
 	// ============
@@ -328,19 +328,21 @@ void APlayerCharacter::MoveSideKey(float Scale) // 왼쪽 오른쪽 값들어옴
 	}
 
 	// Ghost Trail
-	//if (m_MoveKey)
-	//{
-	//	if (!m_OnGhostTrail)
-	//	{
-	//		m_GhostTrailTimeAcc = 0.f;
-	//		m_ActionGhostTrail = false;
-	//	}
-	//	m_OnGhostTrail = true;
-	//}
-	//else
-	//{
-	//	m_OnGhostTrail = false;
-	//}
+	/*
+	if (m_MoveKey)
+	{
+		if (!m_OnGhostTrail)
+		{
+			m_GhostTrailTimeAcc = 0.f;
+			m_ActionGhostTrail = false;
+		}
+		m_OnGhostTrail = true;
+	}
+	else
+	{
+		m_OnGhostTrail = false;
+	}
+	*/
 }
 void APlayerCharacter::RotationZKey(float Scale)
 {
@@ -593,7 +595,6 @@ void APlayerCharacter::ShakeCamera()
 {
 	//카메라 쉐이트
 	GetWorld()->GetFirstPlayerController()->ClientPlayCameraShake(UHitCameraShake::StaticClass());
-	
 }
 
 void APlayerCharacter::TimeDilation(float _Time)
