@@ -205,7 +205,8 @@ public:
 
 public:
 	void FootStep(bool Left);
-
+	void AddGold(int32 _gold);
+	void AddExp(int32 _exp);
 
 };
 // Fill out your copyright notice in the Description page of Project Settings.

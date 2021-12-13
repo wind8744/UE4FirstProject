@@ -131,10 +131,16 @@ private:
 	UPROPERTY()
 		UDataTable* m_UIItemInfoTable;
 
+	UPROPERTY()
+		UDataTable* m_QuestTableInfo;
+
 	EPlayerJob	m_SelectJob;
 	FString		m_SelectName; //내거
 
+	TMap<FString, FQuestData> m_QuestComplete;
+
 public:
+
 	const FString& GetPlayerInfoName() { return m_SelectName; } //내거
 	void SetPlayerInfoName(const FString& Job, const FString& Name);  //내거
 
@@ -147,6 +153,9 @@ public:
 	{
 		return m_SelectJob;
 	}
+
+	const TMap<FString, FQuestData>& GetQuestData() { return m_QuestComplete; }
+
 public:
 	virtual void Init();
 	
@@ -154,4 +163,5 @@ public:
 	const FMonsterTableInfo* FindMonsterInfo(const FString& Name);
 	const FPlayerTableInfo* FindPlayerInfo(const FString& Name);
 	const FUIItemDataInfo* FindUIItemInfo(const FString& Name);
+	const FQuestTableInfo* FindQuestTableInfo(const FString& Name);
 };

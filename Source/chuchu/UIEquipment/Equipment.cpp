@@ -75,3 +75,45 @@ void UEquipment::InitEquipment()
 		m_EquipTileArry[i]->SetInventoryclass(m_Inventoryclass);
 	}
 }
+
+
+#include "Blueprint/WidgetBlueprintLibrary.h"
+FReply UEquipment::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	// Allows users to handle events and return information to the underlying UI layer.
+	FEventReply reply;
+	reply.NativeReply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+	reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, FKey("LeftMouseButton")); //왼쪽 마우스를 누르면 이벤트가 들어옴
+	//DetectDragIfPressed 이; 함수를 통해 밑의 NativeOnDragDetected함수가 호출됨
+
+	return reply.NativeReply;
+}
+
+#include "../UI/WidgetDragDropOperation.h"
+void UEquipment::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	UWidgetDragDropOperation* Wigddo = Cast<UWidgetDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UWidgetDragDropOperation::StaticClass()));
+	//내가 만든 드래그드랍 클래스 갖고옴
+
+	if (nullptr == Wigddo)
+		return;
+
+	Wigddo->WidgetTodrag = this;
+	//옮길 위젯 (멤버변수로 저장)
+
+	Wigddo->MouseOffset = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+	//마우스 offset (멤버변수에 저장)
+
+	Wigddo->DefaultDragVisual = this;
+	//드래그 할 때 보일 위젯 
+
+	Wigddo->Pivot = EDragPivot::MouseDown;
+	//마우스 다운을 한 지점을 기준으로
+
+	OutOperation = Wigddo;
+	//outoperation의 참ㅁ조가 널이 아니라면 native on drop이 호출
+
+	this->RemoveFromParent(); //드래그 할 때 그 전에있던것은 삭제 
+}

@@ -4,6 +4,7 @@
 #include "MainMenuWidget.h"
 #include "InventoryList.h"
 #include "InventoryTile.h"
+#include "QuestWidget.h"
 #include "../UIItem/Inventory.h"
 #include "../UIEquipment/Equipment.h"
 
@@ -15,20 +16,33 @@ void UMainMenuWidget::NativeConstruct()
 	//m_CharacterStateButton = Cast<UButton>(GetWidgetFromName(TEXT("CharacterStateButton")));
 	m_SkillButton = Cast<UButton>(GetWidgetFromName(TEXT("SkillButton")));
 	m_OptionButton = Cast<UButton>(GetWidgetFromName(TEXT("OptionButton")));
+	m_QuestBUtton = Cast<UButton>(GetWidgetFromName(TEXT("QuestButton")));
 
 	//m_InventoryButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory); //인벤토리 버튼이 눌릴때 onInventory함수가 호출
 	//m_CharacterStateButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventoryTile); //
 
 	// 실제로 쓰는것
-	m_SkillButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnEquipment);
-	m_OptionButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory2);
-
+	m_SkillButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnEquipment); //장비창
+	m_OptionButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory2); //인벤토리
+	m_QuestBUtton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnQuestWidget); //퀘스트창
 
 }
 
 void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+}
+
+// ============================
+// 버튼이 눌릴때 호출되는 함수들
+// ============================
+void UMainMenuWidget::OnQuestWidget()
+{
+	if (m_QuestWidget->GetVisibility() == ESlateVisibility::Collapsed)
+		m_QuestWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	else
+		m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UMainMenuWidget::OnEquipment()

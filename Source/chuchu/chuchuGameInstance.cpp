@@ -21,6 +21,10 @@ UchuchuGameInstance::UchuchuGameInstance()
 
 	if (UIItemDataAsset.Succeeded())
 		m_UIItemInfoTable = UIItemDataAsset.Object;
+
+	static ConstructorHelpers::FObjectFinder<UDataTable>	QuestDataAsset(TEXT("DataTable'/Game/UI/QuestUI/DTQuestTableInfo.DTQuestTableInfo'"));
+	if (QuestDataAsset.Succeeded())
+		m_QuestTableInfo = QuestDataAsset.Object;
 }
 
 void UchuchuGameInstance::Init()
@@ -40,6 +44,11 @@ const FPlayerTableInfo* UchuchuGameInstance::FindPlayerInfo(const FString& Name)
 const FUIItemDataInfo* UchuchuGameInstance::FindUIItemInfo(const FString& Name)
 {
 	return m_UIItemInfoTable->FindRow<FUIItemDataInfo>(*Name, "");
+}
+
+const FQuestTableInfo* UchuchuGameInstance::FindQuestTableInfo(const FString& Name)
+{
+	return m_QuestTableInfo->FindRow<FQuestTableInfo>(*Name, "");
 }
 
 void UchuchuGameInstance::SetPlayerInfoName(const FString& Job, const FString& Name)

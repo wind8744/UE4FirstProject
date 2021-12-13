@@ -7,6 +7,7 @@
 #include "MainMenuWidget.h"
 #include "InventoryList.h"
 #include "InventoryTile.h"
+#include "QuestWidget.h"
 #include "MainMenuSkillWidget.h"
 #include"../UIItem/Inventory.h"
 #include "../UIEquipment/Equipment.h"
@@ -46,6 +47,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UEquipment* m_Equipment;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UQuestWidget* m_QuestWidget;
 
 	class UMaterialParameterCollection* m_LandScapeCollection;
 	class UMaterialParameterCollectionInstance* m_LandScapeCollectionInst;
@@ -68,12 +71,14 @@ public:
 
 	UInventory* GetInventory() { return m_Inventory; }
 	UEquipment* GetEquipment() { return m_Equipment; }
+	UQuestWidget* GetQuestWidget() { return m_QuestWidget; }
 
 	void PopupUI(); //MainPlayerController에서 호출
 
 protected:
 	virtual void NativeConstruct(); //생성 ( 소멸도 있음 )
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime); //틱마다 들어오는 함수
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation);
 
 public:
 	UFUNCTION()

@@ -4,7 +4,6 @@
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
-
 #include "Components/Button.h"
 #include "MainMenuWidget.generated.h"
 /**
@@ -16,11 +15,11 @@ class CHUCHU_API UMainMenuWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UButton* m_InventoryButton;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	//	UButton* m_InventoryButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UButton* m_CharacterStateButton;
+		UButton* m_QuestBUtton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UButton* m_SkillButton;
@@ -34,24 +33,21 @@ protected:
 	class UAuctionWidget* m_Auction;
 	class UInventory* m_Inventory;
 	class UEquipment* m_Equipment;
+	class UQuestWidget* m_QuestWidget;
 
 public:
 	//void SetInventoryList(class UInventoryList* List)
 	//{
 	//	m_InventoryList = List;
 	//}
-
-	//void SetInventoryTile(class UInventoryTile* Tile)
-	//{
-	//	m_InventoryTile = Tile;
-	//}
-		
+	void SetQuestWidget(class UQuestWidget* Quest)
+	{
+		m_QuestWidget = Quest;
+	}
 	void SetAuction(class UAuctionWidget* Auction)
 	{
 		m_Auction = Auction;
 	}
-
-	//
 	void SetInventory(class UInventory* Inventory)
 	{
 		m_Inventory = Inventory;
@@ -72,11 +68,6 @@ public:
 	UFUNCTION()
 		void OnInventory2();
 
-	/*
 	UFUNCTION()
-		void OnInventory();
-
-	UFUNCTION()
-		void OnInventoryTile();
-	*/
+		void OnQuestWidget();
 };

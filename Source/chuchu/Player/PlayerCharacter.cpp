@@ -669,3 +669,21 @@ void APlayerCharacter::EquipItem(EEquipType EquipmentType, const FString& Equipm
 void APlayerCharacter::UseItem() {}
 void APlayerCharacter::ChangeWeaponSocket() {}
 void APlayerCharacter::Skill3Loop(){}
+
+void APlayerCharacter::AddGold(int32 _gold)
+{
+	m_PlayerInfo.Gold += _gold;
+	AchuchuGameModeBase* GameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+	//if (GameMode)
+	//	GameMode->GetMainHUD()->GetInventory()->SetGold(m_PlayerInfo.Gold);
+
+
+}
+void APlayerCharacter::AddExp(int32 _exp)
+{
+	m_PlayerInfo.Exp += _exp;
+
+	AchuchuGameModeBase* GameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+	//if (GameMode)
+	//	GameMode->GetMainHUD()->GetInventory()->SetGold(m_PlayerInfo.Gold);
+}
