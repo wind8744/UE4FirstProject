@@ -14,6 +14,7 @@
 #include "NiagaraComponent.h" 
 #include "NiagaraFunctionLibrary.h"
 #include "Math/UnrealMathVectorCommon.h" 
+#include "Blueprint/IUserObjectListEntry.h"
 //#include "Engine/Source/Runtime/Core/Public/Math/UnrealMathVectorCommon.h" //언리얼 문서의 헤더가 아니라 인클루드만 쓰면 됨
 
 #include "GameInfo.generated.h"

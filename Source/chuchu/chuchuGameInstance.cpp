@@ -30,6 +30,148 @@ UchuchuGameInstance::UchuchuGameInstance()
 void UchuchuGameInstance::Init()
 {
 	Super::Init();
+
+	//ProjectilePool::GetInst()->Init(GetWorld());
+	//NetworkManager::GetInst()->Init();
+
+	// 각 퀘스트들이 완료가 되었는지 여부를 가져온다.
+	FQuestData	Data;
+	
+	const FQuestTableInfo* Info = FindQuestTableInfo(TEXT("Quest1"));
+
+	Data.Name = Info->Name;
+	Data.QuestDesc = Info->QuestDesc;
+
+	for (auto& CompleteData : Info->InfoArray)
+	{
+		FQuestDataInfo	DataInfo;
+
+		DataInfo.type = CompleteData.Type;
+		DataInfo.DestName = CompleteData.DestName;
+		DataInfo.MaxCount = CompleteData.Count;
+		DataInfo.Count = 0;
+		DataInfo.Complete = false;
+
+		Data.CompleteArray.Add(DataInfo);
+	}
+
+	for (auto& CompensationData : Info->CompensationArray)
+	{
+		FQuestCompensationInfo	DataInfo;
+
+		DataInfo.Type = CompensationData.Type;
+		DataInfo.Compensation = CompensationData.Compensation;
+
+		Data.CompensationArray.Add(DataInfo);
+	}
+
+	Data.Complete = false;
+
+	m_QuestComplete.Add(TEXT("Quest1"), Data);
+
+	Info = FindQuestTableInfo(TEXT("Quest2"));
+
+	Data.Name = Info->Name;
+	Data.QuestDesc = Info->QuestDesc;
+	Data.CompleteArray.RemoveAll([](FQuestDataInfo v) {return true; });
+	Data.CompensationArray.RemoveAll([](FQuestCompensationInfo v) {return true; });
+
+	for (auto& CompleteData : Info->InfoArray)
+	{
+		FQuestDataInfo	DataInfo;
+
+		DataInfo.type = CompleteData.Type;
+		DataInfo.DestName = CompleteData.DestName;
+		DataInfo.MaxCount = CompleteData.Count;
+		DataInfo.Count = 0;
+		DataInfo.Complete = false;
+
+		Data.CompleteArray.Add(DataInfo);
+	}
+
+	for (auto& CompensationData : Info->CompensationArray)
+	{
+		FQuestCompensationInfo	DataInfo;
+
+		DataInfo.Type = CompensationData.Type;
+		DataInfo.Compensation = CompensationData.Compensation;
+
+		Data.CompensationArray.Add(DataInfo);
+	}
+
+	Data.Complete = false;
+
+	m_QuestComplete.Add(TEXT("Quest2"), Data);
+
+	//Info = FindQuestTableInfo(TEXT("Quest3"));
+
+	//Data.Name = Info->Name;
+	//Data.QuestDesc = Info->QuestDesc;
+	//Data.CompleteArray.RemoveAll([](FQuestDataInfo v) {return true; });
+	//Data.CompensationArray.RemoveAll([](FQuestCompensationInfo v) {return true; });
+
+	//for (auto& CompleteData : Info->InfoArray)
+	//{
+	//	FQuestDataInfo	DataInfo;
+
+	//	DataInfo.type= CompleteData.Type;
+	//	DataInfo.DestName = CompleteData.DestName;
+	//	DataInfo.MaxCount = CompleteData.Count;
+	//	DataInfo.Count = 0;
+	//	DataInfo.Complete = false;
+
+	//	Data.CompleteArray.Add(DataInfo);
+	//}
+
+	//for (auto& CompensationData : Info->CompensationArray)
+	//{
+	//	FQuestCompensationInfo	DataInfo;
+
+	//	DataInfo.Type = CompensationData.Type;
+	//	DataInfo.Compensation = CompensationData.Compensation;
+
+	//	Data.CompensationArray.Add(DataInfo);
+	//}
+
+	//Data.Complete = false;
+
+	//m_QuestComplete.Add(TEXT("Quest3"), Data);
+
+	//Info = FindQuestTableInfo(TEXT("Quest4"));
+
+	//Data.Name = Info->Name;
+	//Data.QuestDesc = Info->QuestDesc;
+	//Data.CompleteArray.RemoveAll([](FQuestDataInfo v) {return true; });
+	//Data.CompensationArray.RemoveAll([](FQuestCompensationInfo v) {return true; });
+
+	//for (auto& CompleteData : Info->InfoArray)
+	//{
+	//	FQuestDataInfo	DataInfo;
+
+	//	DataInfo.type = CompleteData.Type;
+	//	DataInfo.DestName = CompleteData.DestName;
+	//	DataInfo.MaxCount = CompleteData.Count;
+	//	DataInfo.Count = 0;
+	//	DataInfo.Complete = false;
+
+	//	Data.CompleteArray.Add(DataInfo);
+	//}
+
+	//for (auto& CompensationData : Info->CompensationArray)
+	//{
+	//	FQuestCompensationInfo	DataInfo;
+
+	//	DataInfo.Type = CompensationData.Type;
+	//	DataInfo.Compensation = CompensationData.Compensation;
+
+	//	Data.CompensationArray.Add(DataInfo);
+	//}
+
+	//Data.Complete = false;
+
+	//m_QuestComplete.Add(TEXT("Quest4"), Data);
+
+
 }
 
 const FMonsterTableInfo* UchuchuGameInstance::FindMonsterInfo(const FString& Name)

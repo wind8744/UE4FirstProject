@@ -29,17 +29,17 @@ void UQuestDescWidget::AddList(const FQuestDataInfo& _info, int32 _index)
 	{
 	case EQuestType::Collection:
 	{
-		TypeText = TEXT("수집");
+		TypeText = TEXT("Collection");
 	}
 	break;
 	case EQuestType::Hunt:
 	{
-		TypeText = TEXT("사냥");
+		TypeText = TEXT("Hunt");
 	}
 	break;
 	case EQuestType::Communication:
 	{
-		TypeText = TEXT("대화");
+		TypeText = TEXT("Communication");
 	}
 	break;
 	}

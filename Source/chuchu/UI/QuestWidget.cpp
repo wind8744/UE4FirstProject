@@ -14,7 +14,7 @@ void UQuestWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	m_QuestList = Cast<UListView>(GetWidgetFromName(TEXT("ListView_63")));
+	m_QuestList = Cast<UListView>(GetWidgetFromName(TEXT("ListView1")));
 	m_QuestDesc = Cast<UQuestDescWidget>(GetWidgetFromName(TEXT("UI_QuesDesc")));
 	m_CloseButton = Cast<UButton>(GetWidgetFromName(TEXT("CloseButton")));
 
@@ -71,13 +71,15 @@ void UQuestWidget::CloseButtonClick()
 
 	else
 	{
-		SetVisibility(ESlateVisibility::Collapsed);
+		//SetVisibility(ESlateVisibility::Collapsed);
+		AchuchuGameModeBase* chuMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+		chuMode->GetMainHUD()->CloseAllUI();
 
 		//m_Equipclass->CloseEquipUI();
 
-		APlayerController* PController = GetWorld()->GetFirstPlayerController();
-		PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
-		PController->bShowMouseCursor = false;
+		//APlayerController* PController = GetWorld()->GetFirstPlayerController();
+		//PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
+		//PController->bShowMouseCursor = false;
 	}
 }
 

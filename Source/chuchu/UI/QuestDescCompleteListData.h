@@ -78,7 +78,7 @@ public:
 		m_CountMax = CountMax;
 
 		if (m_Count == m_CountMax)
-			m_CountText = TEXT("완료");
+			m_CountText = TEXT("Complete");
 
 		else
 			m_CountText = FString::Printf(TEXT("%d / %d"), Count, CountMax);

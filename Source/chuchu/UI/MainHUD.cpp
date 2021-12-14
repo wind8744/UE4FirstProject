@@ -2,7 +2,7 @@
 
 
 #include "MainHUD.h"
-
+#include "../Player/MainPlayerController.h"
 
 void UMainHUD::NativeConstruct()
 {
@@ -102,4 +102,29 @@ void UMainHUD::PopupUI()
 
 	else
 		m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UMainHUD::CloseAllUI()
+{
+
+	m_Equipment->SetVisibility(ESlateVisibility::Collapsed);
+	m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
+	m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
+
+	APlayerController* PController = GetWorld()->GetFirstPlayerController();
+	PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
+	PController->bShowMouseCursor = false;
+
+	//if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed)
+	//	m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	//else
+	//	m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
+
+	//if (m_QuestWidget->GetVisibility() == ESlateVisibility::Collapsed)
+	//	m_QuestWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+
+	//else
+	//	m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
+
 }

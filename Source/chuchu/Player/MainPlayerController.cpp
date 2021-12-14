@@ -30,9 +30,9 @@ void AMainPlayerController::SetupInputComponent()
 
 void AMainPlayerController::UIKey()
 {
-	m_IsUIMode = m_IsUIMode == true ? false : true;
+	//m_IsUIMode = m_IsUIMode == true ? false : true;
 
-	if (m_IsUIMode)
+	//if (m_IsUIMode)
 	{
 		SetInputMode(FInputModeUIOnly());
 		bShowMouseCursor = true;

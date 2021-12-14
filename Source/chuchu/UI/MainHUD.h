@@ -74,6 +74,7 @@ public:
 	UQuestWidget* GetQuestWidget() { return m_QuestWidget; }
 
 	void PopupUI(); //MainPlayerController에서 호출
+	void CloseAllUI();
 
 protected:
 	virtual void NativeConstruct(); //생성 ( 소멸도 있음 )

@@ -5,6 +5,7 @@
 #include "../UIItem/Inventory.h"
 #include "Components/CanvasPanelSlot.h"
 #include "../Player/MainPlayerController.h"
+#include "../chuchuGameModeBase.h"
 
 void UEquipment::NativeConstruct()
 {
@@ -46,12 +47,10 @@ void UEquipment::CloseButtonClick()
 
 	else
 	{
-		SetVisibility(ESlateVisibility::Collapsed);
-
-		m_Inventoryclass->CloseInvenUI();
-		APlayerController* PController = GetWorld()->GetFirstPlayerController();
-		PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
-		PController->bShowMouseCursor = false;
+		//SetVisibility(ESlateVisibility::Collapsed);
+		AchuchuGameModeBase* chuMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+		chuMode->GetMainHUD()->CloseAllUI();
+		//m_Inventoryclass->CloseInvenUI();
 	}
 }
 

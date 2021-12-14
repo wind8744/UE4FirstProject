@@ -179,13 +179,16 @@ void UInventory::CloseButtonClick()
 
 	else
 	{
-		SetVisibility(ESlateVisibility::Collapsed);
+		AchuchuGameModeBase* chuMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+		chuMode->GetMainHUD()->CloseAllUI();
 
-		m_Equipclass->CloseEquipUI();
+		//SetVisibility(ESlateVisibility::Collapsed);
 
-		APlayerController* PController = GetWorld()->GetFirstPlayerController();
-		PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
-		PController->bShowMouseCursor = false;
+		//m_Equipclass->CloseEquipUI();
+
+		//APlayerController* PController = GetWorld()->GetFirstPlayerController();
+		//PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
+		//PController->bShowMouseCursor = false;
 	}
 }
 
