@@ -13,9 +13,7 @@ UBTService_PlayerDetect::UBTService_PlayerDetect()
 }
 
 //틱이 돌때마다 들어옴
-void UBTService_PlayerDetect::TickNode(
-	UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory,
-	float DeltaSeconds)
+void UBTService_PlayerDetect::TickNode(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory,float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 	
@@ -57,8 +55,13 @@ void UBTService_PlayerDetect::TickNode(
 
 	if (Sweep) //충돌이 있으면
 		//컨트롤러는 블랙보드 들고있음 , 부딪힌 액터를 얻어몸
+	{
 		Controller->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), HitResult.GetActor());
+	}
 
 	else //부딪힌 넘이 없으므로 null
+	{
 		Controller->GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), nullptr);
+	}
+		
 }

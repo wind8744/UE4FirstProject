@@ -26,7 +26,6 @@ ABuffBlue::ABuffBlue()
 void ABuffBlue::BeginPlay()
 {	
 	Super::BeginPlay();
-
 }
 
 // Called every frame

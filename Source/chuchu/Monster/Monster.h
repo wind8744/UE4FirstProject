@@ -107,8 +107,9 @@ protected:
 	float		m_DissolveAccTime;
 	float		m_DissolveRange;
 
-
 	TArray<FString> m_DropItemArray; //드랍 아이템 목록
+
+	int32 m_SkillNum;
 
 public:
 	FVector GetPatrolPoint()
@@ -174,7 +175,11 @@ public:
 public:
 	virtual void NormalAttack();
 	virtual void SpawnEnd();
-
+	virtual int32 GetSKillNum() //BossRampage
+	{
+		if (m_SkillNum >= 2) m_SkillNum = 0;
+		return m_SkillNum++;
+	}
 
 public:
 	UFUNCTION()

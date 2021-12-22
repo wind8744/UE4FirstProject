@@ -16,111 +16,106 @@ UItemData::UItemData()
 
 void UItemData::Use(class APlayerCharacter* character) //(AGhostLady* character)
 {
-	switch (m_ItemType)
+
+	if (m_ItemType == EItemType::Food)
 	{
-	case EItemType::Equip:
+		AGhostLady* ghostchar = Cast<AGhostLady>(character);
+		ghostchar->UseItem();
+	}
+	else if(m_ItemType == EItemType::Equip)
 	{
 		switch (m_EquipType)
 		{
-		case EEquipType::HAIR:
-		{
-			AGhostLady* ghostchar = Cast<AGhostLady>(character); //원래는 캐릭터 공통이므로 playercharacter 에 함수 만드는 것이 낫다..
-			ghostchar->EquipItem(m_EquipType, m_MeshPath);
-
-			if (OwningInventory)
+			case EEquipType::HAIR:
 			{
-				UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::HAIR];
-				equipTile->SetIconTex(m_IconTex);
-				equipTile->SetItemName(m_ItemName);
-				equipTile->SetIsEquip(true);
-			}
-			break;
-		}
-		case EEquipType::TOPBODY:
-		{
-			AGhostLady* ghostchar = Cast<AGhostLady>(character); 
-			ghostchar->EquipItem(m_EquipType, m_MeshPath);
+				AGhostLady* ghostchar = Cast<AGhostLady>(character); //원래는 캐릭터 공통이므로 playercharacter 에 함수 만드는 것이 낫다..
+				ghostchar->EquipItem(m_EquipType, m_MeshPath);
 
-			if (OwningInventory)
+				if (OwningInventory)
+				{
+					UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::HAIR];
+					equipTile->SetIconTex(m_IconTex);
+					equipTile->SetItemName(m_ItemName);
+					equipTile->SetIsEquip(true);
+				}
+				break;
+			}
+			case EEquipType::TOPBODY:
 			{
-				UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::TOPBODY];
-				equipTile->SetIconTex(m_IconTex);
-				equipTile->SetItemName(m_ItemName);
-				equipTile->SetIsEquip(true);
+				AGhostLady* ghostchar = Cast<AGhostLady>(character);
+				ghostchar->EquipItem(m_EquipType, m_MeshPath);
+
+				if (OwningInventory)
+				{
+					UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::TOPBODY];
+					equipTile->SetIconTex(m_IconTex);
+					equipTile->SetItemName(m_ItemName);
+					equipTile->SetIsEquip(true);
+				}
+
+				break;
 			}
-
-			break;
-		}
-		case EEquipType::BOTBODY:
-		{
-			AGhostLady* ghostchar = Cast<AGhostLady>(character); 
-			ghostchar->EquipItem(m_EquipType, m_MeshPath);
-
-			if (OwningInventory)
+			case EEquipType::BOTBODY:
 			{
-				UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::BOTBODY];
-				equipTile->SetIconTex(m_IconTex);
-				equipTile->SetItemName(m_ItemName);
-				equipTile->SetIsEquip(true);
+				AGhostLady* ghostchar = Cast<AGhostLady>(character);
+				ghostchar->EquipItem(m_EquipType, m_MeshPath);
+
+				if (OwningInventory)
+				{
+					UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::BOTBODY];
+					equipTile->SetIconTex(m_IconTex);
+					equipTile->SetItemName(m_ItemName);
+					equipTile->SetIsEquip(true);
+				}
+
+				break;
 			}
-
-			break;
-		}
-		case EEquipType::HAND:
-		{
-			AGhostLady* ghostchar = Cast<AGhostLady>(character);
-			ghostchar->EquipItem(m_EquipType, m_MeshPath);
-
-			if (OwningInventory)
+			case EEquipType::HAND:
 			{
-				UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::HAND];
-				equipTile->SetIconTex(m_IconTex);
-				equipTile->SetItemName(m_ItemName);
-				equipTile->SetIsEquip(true);
+				AGhostLady* ghostchar = Cast<AGhostLady>(character);
+				ghostchar->EquipItem(m_EquipType, m_MeshPath);
+
+				if (OwningInventory)
+				{
+					UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::HAND];
+					equipTile->SetIconTex(m_IconTex);
+					equipTile->SetItemName(m_ItemName);
+					equipTile->SetIsEquip(true);
+				}
+
+				break;
 			}
-
-			break;
-		}
-		case EEquipType::BOOTS:
-		{
-			AGhostLady* ghostchar = Cast<AGhostLady>(character); 
-			ghostchar->EquipItem(m_EquipType, m_MeshPath);
-
-			if (OwningInventory)
+			case EEquipType::BOOTS:
 			{
-				UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::BOOTS];
-				equipTile->SetIconTex(m_IconTex);
-				equipTile->SetItemName(m_ItemName);
-				equipTile->SetIsEquip(true);
+				AGhostLady* ghostchar = Cast<AGhostLady>(character);
+				ghostchar->EquipItem(m_EquipType, m_MeshPath);
+
+				if (OwningInventory)
+				{
+					UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::BOOTS];
+					equipTile->SetIconTex(m_IconTex);
+					equipTile->SetItemName(m_ItemName);
+					equipTile->SetIsEquip(true);
+				}
+
+				break;
 			}
-
-			break;
-		}
-		case EEquipType::WEAPON:
-		{
-			AGhostLady* ghostchar = Cast<AGhostLady>(character);
-			ghostchar->EquipItem(m_EquipType, m_MeshPath);
-
-			if (OwningInventory)
+			case EEquipType::WEAPON:
 			{
-				UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::WEAPON];
-				equipTile->SetIconTex(m_IconTex);
-				equipTile->SetItemName(m_ItemName);
-				equipTile->SetIsEquip(true);
-			}
+				AGhostLady* ghostchar = Cast<AGhostLady>(character);
+				ghostchar->EquipItem(m_EquipType, m_MeshPath);
 
-			break;
-		}
+				if (OwningInventory)
+				{
+					UEquipTile* equipTile = OwningInventory->GetEquipClass()->GetEquipTileArray()[(int)EEquipType::WEAPON];
+					equipTile->SetIconTex(m_IconTex);
+					equipTile->SetItemName(m_ItemName);
+					equipTile->SetIsEquip(true);
+				}
+
+				break;
+			}
 		}
 	}
-	case EItemType::Food:
-	{
-		break;
-	}
-	default:
-	{
-		break;
-	}
-	break;
-	}
+
 }

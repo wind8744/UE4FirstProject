@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "GhostLady.h"
@@ -18,7 +18,7 @@ AGhostLady::AGhostLady()
 	PrimaryActorTick.bCanEverTick = true;
 
 	//teset
-		// bp½ºÅ³1
+		// bpìŠ¤í‚¬1
 	static ConstructorHelpers::FClassFinder<AActor>	Skill1Class(TEXT("Blueprint'/Game/Player/GreyStone/BPGreyStoneSkill1.BPGreyStoneSkill1_C'"));
 
 	if (Skill1Class.Succeeded())
@@ -31,7 +31,7 @@ AGhostLady::AGhostLady()
 	if (GhostLadyAsset.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(GhostLadyAsset.Object);
-		m_PlayerMesh = GhostLadyAsset.Object; 	// °í½ºÆ® Æ®·¹ÀÏÀ» À§ÇÑ ¸âº¯¿¡µµ ¸Ş½¬ µî·Ï
+		m_PlayerMesh = GhostLadyAsset.Object; 	// ê³ ìŠ¤íŠ¸ íŠ¸ë ˆì¼ì„ ìœ„í•œ ë©¤ë³€ì—ë„ ë©”ì‰¬ ë“±ë¡
 	}
 
 	// Anim Asset
@@ -39,7 +39,7 @@ AGhostLady::AGhostLady()
 	if (GhostAnimAsset.Succeeded())
 		GetMesh()->SetAnimInstanceClass(GhostAnimAsset.Class);
 
-	//¸ùÅ¸ÁÖ (Attack)
+	//ëª½íƒ€ì£¼ (Attack)
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> Attack1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Attack/AMGhostLadyAttack1.AMGhostLadyAttack1'"));
 	if (Attack1Asset.Succeeded()) 
 		m_AttackMontageArray.Add(Attack1Asset.Object);
@@ -50,7 +50,7 @@ AGhostLady::AGhostLady()
 	if (Attack3Asset.Succeeded())
 		m_AttackMontageArray.Add(Attack3Asset.Object);
 
-	//¸ùÅ¸ÁÖ (Skill)
+	//ëª½íƒ€ì£¼ (Skill)
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill1.AMGhostLadySkill1'"));
 	if (Skill1Asset.Succeeded())
 		m_SkillMontageArray.Add(Skill1Asset.Object);
@@ -71,22 +71,22 @@ AGhostLady::AGhostLady()
 	if (Skill2LoopAsset.Succeeded())
 		m_SkillMontageArray.Add(Skill2LoopAsset.Object);
 
-	//¸ùÅ¸ÁÖ (fall reconvery)
+	//ëª½íƒ€ì£¼ (fall reconvery)
 	static ConstructorHelpers::FObjectFinder<UAnimMontage>	FallRecoveryAsset(TEXT("AnimMontage'/Game/Player/GhostLady/AMGhostLadyFallRecovery.AMGhostLadyFallRecovery'"));
 
 	if (FallRecoveryAsset.Succeeded())
 	{
 		m_FallRecoveryMontage = FallRecoveryAsset.Object;
 
-		//Ã³À½°ú ³¡À» ¼¯¾îÁÖ´Â ¿ªÈ°
-		m_FallRecoveryMontage->BlendIn.SetBlendOption(EAlphaBlendOption::Cubic);  //ºí·£µù ¿É¼Ç
+		//ì²˜ìŒê³¼ ëì„ ì„ì–´ì£¼ëŠ” ì—­í™œ
+		m_FallRecoveryMontage->BlendIn.SetBlendOption(EAlphaBlendOption::Cubic);  //ë¸”ëœë”© ì˜µì…˜
 		m_FallRecoveryMontage->BlendIn.SetBlendTime(0.1f);
 
-		m_FallRecoveryMontage->BlendOut.SetBlendOption(EAlphaBlendOption::Cubic); //ºí·£µù ¿É¼Ç
+		m_FallRecoveryMontage->BlendOut.SetBlendOption(EAlphaBlendOption::Cubic); //ë¸”ëœë”© ì˜µì…˜
 		m_FallRecoveryMontage->BlendOut.SetBlendTime(0.1f);
 	}
 
-	//¸ùÅ¸ÁÖ (Avoid)
+	//ëª½íƒ€ì£¼ (Avoid)
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> Avoid1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Avoid/AMGhostLadyAvoid1.AMGhostLadyAvoid1'"));
 	if (Avoid1Asset.Succeeded())
 		m_ArrayAvoidMontage.Add(Avoid1Asset.Object);
@@ -100,7 +100,7 @@ AGhostLady::AGhostLady()
 	if (Avoid4Asset.Succeeded())
 		m_ArrayAvoidMontage.Add(Avoid4Asset.Object);
 
-	// Trail -> ¸ŞÅ×¸®¾ó ¹Ù²Ù¾îÁÖ¸é µÊ.
+	// Trail -> ë©”í…Œë¦¬ì–¼ ë°”ê¾¸ì–´ì£¼ë©´ ë¨.
 	static ConstructorHelpers::FObjectFinder<UParticleSystem>	TrailAsset(TEXT("ParticleSystem'/Game/Particle/PSPlayerTrail.PSPlayerTrail'"));
 	if (TrailAsset.Succeeded())
 		m_Trail->SetTemplate(TrailAsset.Object);
@@ -113,23 +113,23 @@ AGhostLady::AGhostLady()
 	// ==========
 	// Equip
 	// ==========
-	//Çï¸ä
+	//í—¬ë©§
 	m_Helmet = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Helmet"));
-	m_Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("HAIR")); //¼ÒÄÏ ÀÌ¸§
+	m_Helmet->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("HAIR")); //ì†Œì¼“ ì´ë¦„
 
-	//ÇÏÀÇ
+	//í•˜ì˜
 	m_BotBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("BotBody"));
 	m_BotBody->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 
-	//»óÀÇ
+	//ìƒì˜
 	m_TopBody = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TopBody"));
 	m_TopBody->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);// , TEXT("ROOT"));
 
-	//Àå°©
+	//ì¥ê°‘
 	m_Hand = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Hand"));
 	m_Hand->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 
-	//½Ã¹ß
+	//ì‹œë°œ
 	m_Boots = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Boots"));
 	m_Boots->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 
@@ -140,9 +140,9 @@ AGhostLady::AGhostLady()
 	m_Hair->SetSkeletalMesh(GhostLadyHairAsset.Object);
 	//m_Hair->SetRelativeLocation(FVector(0.f, 4.f, -166.f));
 
-	//Ä®
+	//ì¹¼
 	m_Sword = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Sword")); //	
-	m_Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SWORD"));   // ºí·»µù ¶§ ¼ÒÄÏ ¾È¿òÁ÷ÀÓ
+	m_Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SWORD"));   // ë¸”ë Œë”© ë•Œ ì†Œì¼“ ì•ˆì›€ì§ì„
 	FQuat rot; rot.Y = 0.f;
 	m_Sword->SetRelativeRotation(rot);
 	//m_Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WEAPON_R"));
@@ -151,7 +151,7 @@ AGhostLady::AGhostLady()
 	//	GhostSwordAsset(TEXT("StaticMesh'/Game/GreatSword/GreatSword/Weapon/GreatSword_02.GreatSword_02'"));
 	//m_Sword->SetStaticMesh(GhostSwordAsset.Object); //**
 	
-	//Ä® Ãæµ¹Ã¼ Ä¸½¶
+	//ì¹¼ ì¶©ëŒì²´ ìº¡ìŠ
 	m_WeaponCollisionCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("WeaponCollisionCapsule"));
 	m_WeaponCollisionCapsule->AttachToComponent(m_Sword, FAttachmentTransformRules::KeepRelativeTransform, TEXT("SWORD"));
 	rot.Y = 90.f;
@@ -171,7 +171,7 @@ AGhostLady::AGhostLady()
 	if (BarAsset.Succeeded())
 		m_CoolTimebarWidget->SetWidgetClass(BarAsset.Class);
 
-	m_CoolTimebarWidget->SetWidgetSpace(EWidgetSpace::Screen); // ¹°Ã¼¿¡ °¡·ÁÁöÁö ¾Ê´Â´Ù world´Â ¸Ş½¬¿¡ °¡·ÁÁü
+	m_CoolTimebarWidget->SetWidgetSpace(EWidgetSpace::Screen); // ë¬¼ì²´ì— ê°€ë ¤ì§€ì§€ ì•ŠëŠ”ë‹¤ worldëŠ” ë©”ì‰¬ì— ê°€ë ¤ì§
 	m_CoolTimebarWidget->SetDrawSize(FVector2D(200.f, 60.f));
 	m_CoolTimebarWidget->SetRelativeLocation(FVector(0.f, 0.f, 230.f));
 	m_CoolTimebarWidget->SetBlendMode(EWidgetBlendMode::Transparent);
@@ -214,7 +214,7 @@ AGhostLady::AGhostLady()
 // Called when the game starts or when spawned
 void AGhostLady::BeginPlay()
 {
-	// Super : ºÎ¸ğÅ¬·¡½º¸¦ ÀÇ¹ÌÇÑ´Ù.
+	// Super : ë¶€ëª¨í´ë˜ìŠ¤ë¥¼ ì˜ë¯¸í•œë‹¤.
 	Super::BeginPlay();
 
 	//bar widget
@@ -240,15 +240,18 @@ void AGhostLady::Tick(float DeltaTime)
 			m_StartTimer = false;
 		}
 	}
-	
-	//¾ÕÀ¸·Î ÀÌµ¿
+	//ì´ˆì 
+	//m_Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
+	//m_Camera->PostProcessSettings.DepthOfFieldFocalDistance = 1.f;
+
+	//ì•ìœ¼ë¡œ ì´ë™
 	//AddMovementInput(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.5f).GetSafeNormal(), 0.5, true);
 	
-	//¾ÕÀ¸·Î ½î±â
-	//GetCharacterMovement()->BrakingFrictionFactor = 0.f; //¸¶Âû·ÂÀ» 0À¸·Î ¼³Á¤, ¶¥¿¡ ´êÀ»¶§ ¼Óµµ°¡ ´À·ÁÁö´Â °ÍÀ» ¹æÁöÇÏ±â À§ÇÔ
+	//ì•ìœ¼ë¡œ ì˜ê¸°
+	//GetCharacterMovement()->BrakingFrictionFactor = 0.f; //ë§ˆì°°ë ¥ì„ 0ìœ¼ë¡œ ì„¤ì •, ë•…ì— ë‹¿ì„ë•Œ ì†ë„ê°€ ëŠë ¤ì§€ëŠ” ê²ƒì„ ë°©ì§€í•˜ê¸° ìœ„í•¨
 	//LaunchCharacter(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0).GetSafeNormal() * m_DashDistance, true, true);
-	//GetCharacterMovement()->StopMovementImmediately(); //ÀÌµ¿ ÁßÁö È£Ãâ
-	//GetCharacterMovement()->BrakingFrictionFactor = 2.f; //¸¶Âû·Â ÃÊ±âÈ­
+	//GetCharacterMovement()->StopMovementImmediately(); //ì´ë™ ì¤‘ì§€ í˜¸ì¶œ
+	//GetCharacterMovement()->BrakingFrictionFactor = 2.f; //ë§ˆì°°ë ¥ ì´ˆê¸°í™”
 }
 
 // Called to bind functionality to input
@@ -273,12 +276,12 @@ void AGhostLady::Dash()
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DashTrail, GetActorLocation(), ActorVelovity.Rotation());
 
 
-	//ºñµ¿±â ¿¡¼Â ·Îµù
+	//ë¹„ë™ê¸° ì—ì…‹ ë¡œë”©
 	//ANormalEffect* Effect2 = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),
 	//	GetActorLocation(), GetActorForwardVector().Rotation(), param);
 	//Effect2->LoadNiagaraAsync(TEXT("AuroraDash"));
 
-	//µ¿±â ¿¡¼Â ·Îµù
+	//ë™ê¸° ì—ì…‹ ë¡œë”©
 	//UNiagaraSystem* particlens = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/BlinkAndDashVFX/VFX_Niagara/NS_Blink_Psionic.NS_Blink_Psionic'")));
 	//if (particlens)
 	//	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), particlens, GetActorLocation(), GetActorForwardVector().Rotation());
@@ -286,7 +289,7 @@ void AGhostLady::Dash()
 
 void AGhostLady::Attack()
 {
-	// 0¹ø °ø°İ ¸ğ¼ÇÀÌ Àç»ıÀÌ ¾ÈµÇ°í ÀÖ´Ù¸é Àç»ıÀ» ½ÃÄÑÁØ´Ù.
+	// 0ë²ˆ ê³µê²© ëª¨ì…˜ì´ ì¬ìƒì´ ì•ˆë˜ê³  ìˆë‹¤ë©´ ì¬ìƒì„ ì‹œì¼œì¤€ë‹¤.
 	if (!m_AnimInstance->Montage_IsPlaying(m_AttackMontageArray[m_AttackIndex]))
 	{
 		m_AnimInstance->Montage_SetPosition(m_AttackMontageArray[m_AttackIndex], 0.f);
@@ -309,13 +312,13 @@ void AGhostLady::OnComponentBeginOverlapWeapon(UPrimitiveComponent* OverlappedCo
 		ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),
 			SweepResult.ImpactPoint, SweepResult.ImpactNormal.Rotation(), param);
 
-		// ³ªÀÌ¾Æ°¡¶ó ¾Ö¼ÂÀ» ·ÎµùÇÑ´Ù.
+		// ë‚˜ì´ì•„ê°€ë¼ ì• ì…‹ì„ ë¡œë”©í•œë‹¤.
 		Effect->LoadNiagaraAsync(TEXT("GhostLadySlash")); //GhostLadySlash
 
 		// Sound
 		//Effect->LoadSoundAsync(TEXT("HitNormal"));
 
-		// µ¥¹ÌÁö¸¦ Àü´ŞÇÑ´Ù.
+		// ë°ë¯¸ì§€ë¥¼ ì „ë‹¬í•œë‹¤.
 		FDamageEvent	DmgEvent;
 		float Damage = SweepResult.GetActor()->TakeDamage(m_PlayerInfo.Attack, DmgEvent, GetController(), this);
 	}
@@ -325,12 +328,12 @@ void AGhostLady::NormalAttack()
 	Super::NormalAttack();
 
 	//========
-	//Ä¸½¶Ãæµ¹
+	//ìº¡ìŠì¶©ëŒ
 	//========
-	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //°ø°İÀÌ ½ÃÀÛµÉ ¶§ Äİ¸®Àü È°¼ºÈ­
+	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //ê³µê²©ì´ ì‹œì‘ë  ë•Œ ì½œë¦¬ì „ í™œì„±í™”
 
 	//===========
-	// Ä³¸¯ÅÍ ¹ß»ç
+	// ìºë¦­í„° ë°œì‚¬
 	//===========
 	//LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.f), 500.f, 0.3f);
 
@@ -428,8 +431,8 @@ void AGhostLady::RemoveItem(EEquipType EquipmentType)
 	}
 	case EEquipType::WEAPON:
 	{
-		m_Sword->SetStaticMesh(nullptr); //¹«±â ¹şÀ½
-		InitWeaponSocket(); // socket, anim ÃÊ±âÈ­
+		m_Sword->SetStaticMesh(nullptr); //ë¬´ê¸° ë²—ìŒ
+		InitWeaponSocket(); // socket, anim ì´ˆê¸°í™”
 		m_DidEquipWeapon = false;
 		break;
 	}
@@ -439,11 +442,13 @@ void AGhostLady::RemoveItem(EEquipType EquipmentType)
 
 void AGhostLady::UseItem()
 {
+	Super::UseItem();
+
 }
 
 void AGhostLady::ChangeWeaponSocket()
 {
-	m_Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WEAPON_R")); //ºí·£µù ¶§ Sword¼ÒÄÏÀÌ ¾È¿òÁ÷ÀÌ¹Ç·Î ´Ù¸¥ ¼ÒÄÏÀ¸·Î ¹Ù²Ù¾îÁÜ
+	m_Sword->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("WEAPON_R")); //ë¸”ëœë”© ë•Œ Swordì†Œì¼“ì´ ì•ˆì›€ì§ì´ë¯€ë¡œ ë‹¤ë¥¸ ì†Œì¼“ìœ¼ë¡œ ë°”ê¾¸ì–´ì¤Œ
 }
 
 void AGhostLady::InitWeaponSocket()
@@ -473,7 +478,7 @@ void AGhostLady::Skill2()
 	}
 }
 
-void AGhostLady::InitSkill2() //ÄğÅ¸ÀÓ ÀÌÈÄ Å¸ÀÌ¸Ó È£Ãâ
+void AGhostLady::InitSkill2() //ì¿¨íƒ€ì„ ì´í›„ íƒ€ì´ë¨¸ í˜¸ì¶œ
 {
 	m_Skill2Enable = true;
 }
@@ -517,10 +522,10 @@ void AGhostLady::Skill4()
 	}
 }
 
-// Anim Notify¿¡¼­ µé¾î¿À´Â °÷
+// Anim Notifyì—ì„œ ë“¤ì–´ì˜¤ëŠ” ê³³
 void AGhostLady::UseSkill()
 {
-	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //°ø°İÀÌ ½ÃÀÛµÉ ¶§ Äİ¸®Àü È°¼ºÈ­
+	m_WeaponCollisionCapsule->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); //ê³µê²©ì´ ì‹œì‘ë  ë•Œ ì½œë¦¬ì „ í™œì„±í™”
 	m_AnimInstance->ChangeAnimType(EPlayerAnimType::Skill);
 
 	switch (m_PushedSkillIdx)
@@ -528,10 +533,10 @@ void AGhostLady::UseSkill()
 
 		case 1:
 		{
-			// Ä³¸¯ÅÍ ¹ß»ç
+			// ìºë¦­í„° ë°œì‚¬
 			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.f), 1000.f, 0.8f);
 
-			//Ä«¸Ş¶ó Fov effect
+			//ì¹´ë©”ë¼ Fov effect
 			m_DashFov = 1;
 			GetWorldTimerManager().SetTimer(UnusedHandle, this, &APlayerCharacter::StopDashing, m_DashStop, false);
 
@@ -541,40 +546,40 @@ void AGhostLady::UseSkill()
 		{
 			//AGreyStoneSkill1* Skill = GetWorld()->SpawnActor<AGreyStoneSkill1>(m_Skill1class,GetActorLocation() + GetActorForwardVector() * 100.f, GetActorRotation());
 
-			m_Skill2Enable = false; //ÄğÅ¸ÀÓ ÈÄ ´Ù½Ã true
-			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.2f,false);	//ÇÃ·¹ÀÌ¾î Á¡ÇÁ
-			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); 			//Àç»ç¿ë ´ë±â½Ã°£
+			m_Skill2Enable = false; //ì¿¨íƒ€ì„ í›„ ë‹¤ì‹œ true
+			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.2f,false);	//í”Œë ˆì´ì–´ ì í”„
+			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); 			//ì¬ì‚¬ìš© ëŒ€ê¸°ì‹œê°„
 
 			break;
 		}
-		case 3: //Å°´Ù¿î °ø°İ
+		case 3: //í‚¤ë‹¤ìš´ ê³µê²©
 		{
-			// Ä³¸¯ÅÍ ¹ß»ç
+			// ìºë¦­í„° ë°œì‚¬
 			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 0.f), m_Skill3Distance, m_Skill3InitTime);
 
-			//Ä«¸Ş¶ó Fov effect
+			//ì¹´ë©”ë¼ Fov effect
 			m_DashFov =1;
 			GetWorldTimerManager().SetTimer(UnusedHandle, this, &APlayerCharacter::StopDashing, m_DashStop, false); 
 
 			if (m_Skill3Enable)
 			{
-				//ÃÖ´ë ´ë¹ÌÁö
+				//ìµœëŒ€ ëŒ€ë¯¸ì§€
 				PrintViewport(1.f, FColor::Red, TEXT("max")); //Loop
 			}
 			else
 			{
-				//±×³É µ¥¹ÌÁö
+				//ê·¸ëƒ¥ ë°ë¯¸ì§€
 				PrintViewport(1.f, FColor::Blue, TEXT("normal")); //Loop
 			}
 
 			break;
 		}
-		case 4: //½ºÅÃ or Ä¿¸Çµå?
+		case 4: //ìŠ¤íƒ or ì»¤ë§¨ë“œ?
 		{
 
 			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.f ,false);
 
-			//µ¿±â ¿¡¼Â ·Îµù
+			//ë™ê¸° ì—ì…‹ ë¡œë”©
 			UNiagaraSystem* particlens = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/sA_StylizedSwordSet/Fx/NS_Slash_UptoDown_Lv3_2.NS_Slash_UptoDown_Lv3_2'")));
 			if (particlens)
 				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), particlens, GetActorLocation(),GetActorForwardVector().Rotation());
@@ -593,9 +598,9 @@ void AGhostLady::LaunchGhostLady(const FVector _launchVelocity, float _distance,
 {
 	if (_FrictionFactor)
 	{
-		GetCharacterMovement()->BrakingFrictionFactor = 0.f; //¸¶Âû·ÂÀ» 0À¸·Î ¼³Á¤, ¶¥¿¡ ´êÀ»¶§ ¼Óµµ°¡ ´À·ÁÁö´Â °ÍÀ» ¹æÁöÇÏ±â À§ÇÔ
+		GetCharacterMovement()->BrakingFrictionFactor = 0.f; //ë§ˆì°°ë ¥ì„ 0ìœ¼ë¡œ ì„¤ì •, ë•…ì— ë‹¿ì„ë•Œ ì†ë„ê°€ ëŠë ¤ì§€ëŠ” ê²ƒì„ ë°©ì§€í•˜ê¸° ìœ„í•¨
 		LaunchCharacter(FVector(_launchVelocity.X, _launchVelocity.Y, _launchVelocity.Z).GetSafeNormal() * _distance, true, true);
-		GetWorldTimerManager().SetTimer(m_SkillFovInitHandle, this, &AGhostLady::InitLaunchGhostLady, _initTime, false); //_initTime½Ã°£ ÀÌÈÄ ÇÔ¼ö È£Ãâ
+		GetWorldTimerManager().SetTimer(m_SkillFovInitHandle, this, &AGhostLady::InitLaunchGhostLady, _initTime, false); //_initTimeì‹œê°„ ì´í›„ í•¨ìˆ˜ í˜¸ì¶œ
 	}
 	else
 	{
@@ -606,32 +611,32 @@ void AGhostLady::LaunchGhostLady(const FVector _launchVelocity, float _distance,
 
 void AGhostLady::InitLaunchGhostLady()
 {
-	GetCharacterMovement()->StopMovementImmediately(); //ÀÌµ¿ ÁßÁö È£Ãâ
-	GetCharacterMovement()->BrakingFrictionFactor = 2.f; //¸¶Âû·Â ÃÊ±âÈ­
+	GetCharacterMovement()->StopMovementImmediately(); //ì´ë™ ì¤‘ì§€ í˜¸ì¶œ
+	GetCharacterMovement()->BrakingFrictionFactor = 2.f; //ë§ˆì°°ë ¥ ì´ˆê¸°í™”
 }
 
 
 void AGhostLady::GhostLadySkill4()
 {
-	// Ãæµ¹Ã¼
+	// ì¶©ëŒì²´
 	FHitResult result2;
 	FVector	PlayerLoc = GetActorLocation();
 	FVector	Forward = GetActorForwardVector();
 
-	FCollisionQueryParams	params(NAME_None, false, this); //Ãæµ¹À» À§ÇÑ ÆÄ¶ó¹ÌÅÍµé 
+	FCollisionQueryParams	params(NAME_None, false, this); //ì¶©ëŒì„ ìœ„í•œ íŒŒë¼ë¯¸í„°ë“¤ 
 
-	// ±ÙÁ¢°ø°İÀ¸·Î ÀÌ Å¸ÀÌ¹Ö¿¡ Ãæµ¹Ã³¸®¸¦ ÇØÁÖµµ·Ï ÇÑ´Ù.
-	TArray<FHitResult>	HitResultArray; //t¾î·¡ÀÌ Å¸ÀÔÀ¸·Î hit°á°ú ¹è¿­À» ¸¸µé¾îÁÜ , Ãæµ¹À» ÇÑ µÚ Ãæµ¹ÀÇ °á°ú°ªÀ» ÀúÀåÇÏ´Â ±¸Á¶Ã¼
-	//impactpoint´Â ºÎµúÈù À§Ä¡ normalÀº ºÎµúÈù ¹æÇâ 
+	// ê·¼ì ‘ê³µê²©ìœ¼ë¡œ ì´ íƒ€ì´ë°ì— ì¶©ëŒì²˜ë¦¬ë¥¼ í•´ì£¼ë„ë¡ í•œë‹¤.
+	TArray<FHitResult>	HitResultArray; //tì–´ë˜ì´ íƒ€ì…ìœ¼ë¡œ hitê²°ê³¼ ë°°ì—´ì„ ë§Œë“¤ì–´ì¤Œ , ì¶©ëŒì„ í•œ ë’¤ ì¶©ëŒì˜ ê²°ê³¼ê°’ì„ ì €ì¥í•˜ëŠ” êµ¬ì¡°ì²´
+	//impactpointëŠ” ë¶€ë”ªíŒ ìœ„ì¹˜ normalì€ ë¶€ë”ªíŒ ë°©í–¥ 
 
 	FVector AttackBox;
 	AttackBox.X = 300.f;
 	AttackBox.Y = 300.f;
 	AttackBox.Z = 300.f;
 
-	bool Sweep = GetWorld()->SweepMultiByChannel(HitResultArray, PlayerLoc, //ıÆ¼´Â ¿©·¯¸¶¸® ½Ì±ÛÀº ÇÑ¸¶¸® //µÎ¹øÂ° ÀÎÀÚ´Â Ãæµ¹ ½ÃÀÛÁ¡	
-		PlayerLoc, FQuat::Identity, //°ø°İ °Å¸®, È¸ÀüÁ¤º¸°¡ ±âº» 
-		ECollisionChannel::ECC_GameTraceChannel3, FCollisionShape::MakeBox(AttackBox),//MakeSphere(m_PlayerInfo.AttackDistance), //engineTrace»ç¿ëxxx ,
+	bool Sweep = GetWorld()->SweepMultiByChannel(HitResultArray, PlayerLoc, //ë©…í‹°ëŠ” ì—¬ëŸ¬ë§ˆë¦¬ ì‹±ê¸€ì€ í•œë§ˆë¦¬ //ë‘ë²ˆì§¸ ì¸ìëŠ” ì¶©ëŒ ì‹œì‘ì 	
+		PlayerLoc, FQuat::Identity, //ê³µê²© ê±°ë¦¬, íšŒì „ì •ë³´ê°€ ê¸°ë³¸ 
+		ECollisionChannel::ECC_GameTraceChannel3, FCollisionShape::MakeBox(AttackBox),//MakeSphere(m_PlayerInfo.AttackDistance), //engineTraceì‚¬ìš©xxx ,
 		params);
 
 
@@ -645,13 +650,13 @@ void AGhostLady::GhostLadySkill4()
 	for (auto& result : HitResultArray)
 	{
 		FActorSpawnParameters	param;
-		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; // ºÎµúÈ÷´ø ¾ÈºÎµúÈ÷´ø ¹«Á¶°Ç ºÒ·¯¿Àµµ·Ï
+		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; // ë¶€ë”ªíˆë˜ ì•ˆë¶€ë”ªíˆë˜ ë¬´ì¡°ê±´ ë¶ˆëŸ¬ì˜¤ë„ë¡
 
 		ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),
-			result.ImpactPoint, result.ImpactNormal.Rotation(), param); //À§Ä¡Á¤º¸, È¸ÀüÁ¤º¸(¾î´À°¢µµ?:ºÎµúÇûÀ»¶§ ¹æÇâº¤ÅÍÀÇ ¹İ´ë¹æÇâ), ¹æÇâº¤ÅÍ¸¦ È¸ÀüÁ¤º¸·Î ¹Ù²Ù¾îÁÜ, À§¿¡¼­ ºÒ·¯¿Â ÆÄ¶ó¹ÌÅÍ Á¤º¸ 
+			result.ImpactPoint, result.ImpactNormal.Rotation(), param); //ìœ„ì¹˜ì •ë³´, íšŒì „ì •ë³´(ì–´ëŠê°ë„?:ë¶€ë”ªí˜”ì„ë•Œ ë°©í–¥ë²¡í„°ì˜ ë°˜ëŒ€ë°©í–¥), ë°©í–¥ë²¡í„°ë¥¼ íšŒì „ì •ë³´ë¡œ ë°”ê¾¸ì–´ì¤Œ, ìœ„ì—ì„œ ë¶ˆëŸ¬ì˜¨ íŒŒë¼ë¯¸í„° ì •ë³´ 
 
-		// ¾Ö¼ÂÀ» ·ÎµùÇÑ´Ù.
-		//µ¿±â ¿¡¼Â ·Îµù
+		// ì• ì…‹ì„ ë¡œë”©í•œë‹¤.
+		//ë™ê¸° ì—ì…‹ ë¡œë”©
 		UNiagaraSystem* NSHit = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/StrikeVFX/FX/FX_AshStrike1.FX_AshStrike1'")));
 		if (NSHit)
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NSHit, result.ImpactPoint, result.ImpactNormal.Rotation());
@@ -662,14 +667,14 @@ void AGhostLady::GhostLadySkill4()
 		Effect->LoadSoundAsync(TEXT("HitNormal"));
 		//Effect->LoadSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
 
-		// µ¥¹ÌÁö¸¦ Àü´ŞÇÑ´Ù.
+		// ë°ë¯¸ì§€ë¥¼ ì „ë‹¬í•œë‹¤.
 		FDamageEvent	DmgEvent;
-		//ÃÖÁ¾ µ¥¹ÌÁö
+		//ìµœì¢… ë°ë¯¸ì§€
 		float Damage = result.GetActor()->TakeDamage(m_PlayerInfo.Attack, DmgEvent, GetController(), this);
 
 	}
 
 
-	// ¹Ğ·Á³ª±â
+	// ë°€ë ¤ë‚˜ê¸°
 
 }

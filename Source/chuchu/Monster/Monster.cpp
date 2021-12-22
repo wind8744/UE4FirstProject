@@ -4,6 +4,7 @@
 #include "Monster.h"
 #include "MonsterSpawnPoint.h"
 #include "../chuchuGameInstance.h"
+#include "../chuchuGameModeBase.h"
 #include "MonsterAIController.h"
 #include "../Effect/HitCameraShake.h"
 #include "../UIItem/ItemBox.h"
@@ -166,6 +167,16 @@ float AMonster::TakeDamage(float DamageAmount,struct FDamageEvent const& DamageE
 		if (MonsterController)
 			MonsterController->BrainComponent->StopLogic(TEXT("Dead")); //ai를 멈춘 것임
 
+		//몬스터를 죽였을때 퀘스트 조건 체크
+		AchuchuGameModeBase* gameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+		if (gameMode)
+		{
+			UQuestWidget* widget = gameMode->GetMainHUD()->GetQuestWidget();
+			if (widget)
+			{
+				widget->QuestCheck(EQuestType::Hunt, m_MonsterInfo.Name);
+			}
+		}
 
 		//아이템 드랍
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -174,6 +185,7 @@ float AMonster::TakeDamage(float DamageAmount,struct FDamageEvent const& DamageE
 		UchuchuGameInstance* gameinst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance()); // 게임 인스턴스는 레벨이 몇개이던 하나만 만들어짐
 		if (gameinst)
 		{
+
 			const FUIItemDataInfo* iteminfo = gameinst->FindUIItemInfo(m_DropItemArray[itemindex]);
 			if (iteminfo)
 			{

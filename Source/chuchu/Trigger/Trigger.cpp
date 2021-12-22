@@ -28,19 +28,16 @@ void ATrigger::Tick(float DeltaTime)
 
 }
 
-//강의 55 참고
-void ATrigger::TriggerBeginOverlap(UPrimitiveComponent* OverlapCom, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-	const FHitResult& SweepResult)
+void ATrigger::TriggerBeginOverlap(UPrimitiveComponent* OverlapCom, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//PrintViewport(1.f, FColor::Red, TEXT("P Begin Trigger"));
-	m_TriggerBeginDelegate.Broadcast();
+	//트리거가 오버랩 돼서 들어오는 이벤트에 델리게이트를 브로캐스트 하면 안에 등록된 모든 함수가 호출 된다 -> 트리거를 상속받은 포탈 트리거클래스에서 트리거 비긴 함수가 실행된다
+	//PrintViewport(1.f, FColor::Red, TEXT("Broadcast !!"));
+	m_DelegateTriggerBegin.Broadcast(); 
+
 }
 
-void ATrigger::TriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex)
+void ATrigger::TriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex)
 {
 	//PrintViewport(1.f, FColor::Red, TEXT("P End Trigger"));
-	m_TriggerEndDelegate.Broadcast();
+	m_DelegateTriggerEnd.Broadcast();
 }

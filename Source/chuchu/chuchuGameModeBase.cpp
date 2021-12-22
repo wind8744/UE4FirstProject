@@ -20,8 +20,6 @@ AchuchuGameModeBase::AchuchuGameModeBase()
 	if (KnightClass.Succeeded())
 		m_PlayerClassArray.Add(KnightClass.Class);
 		
-
-	
 	//AUrora
 	/*
 	static ConstructorHelpers::FClassFinder<APawn> KnightClass(TEXT("Blueprint'/Game/Player/Aurora/BPAurora.BPAurora_C'")); 
@@ -51,8 +49,7 @@ AchuchuGameModeBase::AchuchuGameModeBase()
 	PlayerControllerClass = AMainPlayerController::StaticClass();
 }
 
-void AchuchuGameModeBase::InitGame(const FString& MapName,
-	const FString& Options, FString& ErrorMessage)
+void AchuchuGameModeBase::InitGame(const FString& MapName,const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
@@ -98,15 +95,28 @@ void AchuchuGameModeBase::InitGame(const FString& MapName,
 
 
 }
-
+#include "Player/GhostLady.h"
 void AchuchuGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	FString LevelName = UGameplayStatics::GetCurrentLevelName(GetWorld());
+	if(LevelName.Equals(TEXT("Main2"), ESearchCase::CaseSensitive)) // FString 비교할 떄 사용
+	{
+		AGhostLady* Player = Cast<AGhostLady>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		if (Player)
+		{
+			Player->EquipItem(EEquipType::TOPBODY, TEXT("SkeletalMesh'/Game/GhostLady_S2/Meshes/Characters/Separates/TopBodies/SK_TopBodyD_C.SK_TopBodyD_C'"));
+			Player->EquipItem(EEquipType::BOTBODY, TEXT("SkeletalMesh'/Game/GhostLady_S2/Meshes/Characters/Separates/BotBodies/SK_BotBodyD_B.SK_BotBodyD_B'"));
+			Player->EquipItem(EEquipType::BOOTS, TEXT("SkeletalMesh'/Game/GhostLady_S2/Meshes/Characters/Separates/Shoes/SK_Boots_D.SK_Boots_D'"));
+			Player->EquipItem(EEquipType::HAND, TEXT("SkeletalMesh'/Game/GhostLady_S2/Meshes/Characters/Separates/Gauntlets/SK_GauntletsMerge_D.SK_GauntletsMerge_D'"));
+			Player->EquipItem(EEquipType::WEAPON, TEXT("StaticMesh'/Game/GreatSword/GreatSword/Weapon/GreatSword_02.GreatSword_02'"));
+		}
+	}
+
 	if (IsValid(m_MainHUDClass))
 	{
-		m_MainHUD = Cast<UMainHUD>(CreateWidget(GetWorld(),
-			m_MainHUDClass));
+		m_MainHUD = Cast<UMainHUD>(CreateWidget(GetWorld(),m_MainHUDClass));
 
 		if (m_MainHUD)
 			m_MainHUD->AddToViewport(); //뷰포트에 붙여라
@@ -118,7 +128,6 @@ void AchuchuGameModeBase::BeginPlay()
 	FInputModeGameAndUI	Mode;
 	Controller->SetInputMode(Mode);
 	Controller->bShowMouseCursor = true;
-
 	*/
 
 	APlayerController* Controller = GetWorld()->GetFirstPlayerController();

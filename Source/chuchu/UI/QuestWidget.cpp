@@ -166,11 +166,11 @@ void UQuestWidget::QuestClick(UObject* Data)
 		}
 	}
 }
-
+//리스트 뷰가 클릭되었을떄
 void UQuestWidget::QuestSelect(UObject* Data)
 {
 	UQuestListData* Item = Cast<UQuestListData>(Data);
-	PrintViewport(5.f, FColor::Red, Item->GetQuestName());
+	//PrintViewport(5.f, FColor::Red, Item->GetQuestName());
 
 	if (m_PrevSelect)
 		m_PrevSelect->GetOwnerWidget()->Select(false);
@@ -196,7 +196,7 @@ void UQuestWidget::QuestCheck(EQuestType _type, const FString& Name)
 			continue;
 
 		int32	CompleteCount = 0;
-
+		FQuestDataInfo Questtest = Info->CompleteArray[(uint8)_type];
 		for (auto& QuestData : Info->CompleteArray)
 		{
 			if (QuestData.Complete)
@@ -259,25 +259,31 @@ void UQuestWidget::QuestCheck(EQuestType _type, const FString& Name)
 				{
 					UchuchuGameInstance* ChuInst = GetWorld()->GetGameInstance<UchuchuGameInstance>();
 
-					//if (ChuInst)
-					//{
-					//	const FUIItemTableInfo* ItemInfo = ChuInst->FindUIItemInfo(CompensationData.Compensation);
+					if (ChuInst)
+					{
+						const FUIItemDataInfo* ItemInfo = ChuInst->FindUIItemInfo(CompensationData.Compensation);
 
-					//	if (ItemInfo)
-					//	{
-					//		AchuchuGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AchuchuGameModeBase>();
+						if (ItemInfo)
+						{
+							AchuchuGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AchuchuGameModeBase>();
 
-					//		if (GameMode)
-					//		{
-					//			UMainHUD* MainHUD = GameMode->GetMainHUD();
+							if (GameMode)
+							{
+								UMainHUD* MainHUD = GameMode->GetMainHUD();
 
-					//			if (MainHUD)
-					//			{
-					//				MainHUD->GetInventory()->AddItem(ItemInfo);
-					//			}
-					//		}
-					//	}
-					//}
+								if (MainHUD)
+								{
+									UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
+									ItemData->SetNameText(ItemInfo->m_ItemName);
+									ItemData->SetIconTex(ItemInfo->m_Thumbnail);
+									ItemData->SetMeshPath(ItemInfo->m_MeshPath);
+									ItemData->SetItemType(EItemType::Food, ItemInfo->m_EquipType);
+									ItemData->SetPickMesh(ItemInfo->m_PickMesh);
+									MainHUD->GetInventory()->AddItem(ItemData);
+								}
+							}
+						}
+					}
 				}
 				break;
 				case EQuestCompensationType::Exp:

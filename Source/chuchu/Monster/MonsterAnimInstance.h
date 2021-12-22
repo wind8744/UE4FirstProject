@@ -16,6 +16,8 @@ enum class EMonsterAnimType : uint8
 	Attack,
 	Death,
 	Skill,
+	Skill2,
+	Skill3
 };
 
 UENUM(BlueprintType)

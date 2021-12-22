@@ -110,32 +110,39 @@ void UInventory::ItemClick(UObject* Data)
 		APlayerCharacter* Player = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 		UItemData* itemData = Cast<UItemData>(Data);
 
-		//장착하기 전에 이전 데이터 먼저 받아옴(이전에 장비가 있던 상태인지 아닌지의 데이터)
-		UEquipTile* oldItem = m_Equipclass->GetEquipTileArray()[(int)itemData->GetEquipType()];
-		bool IsEquiped = oldItem->GetIsEquip();
-
-		//장착 후 IsEquip이 true로 데이터가 바뀜
-		itemData->SetInventory(this);
-		itemData->Use(Player);
-
-		// 장착한 아이템이 존재했을 때 다시 인벤토리로 반환
-		if (IsEquiped)
+		if (itemData->GetItemType() == EItemType::Food)
 		{
-			const FString ItemOldName = oldItem->GetItemOldName();
-			UchuchuGameInstance* gameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
-			if (gameInst)
+			itemData->Use(Player);
+		}
+		else
+		{
+			//장착하기 전에 이전 데이터 먼저 받아옴(이전에 장비가 있던 상태인지 아닌지의 데이터)
+			UEquipTile* oldItem = m_Equipclass->GetEquipTileArray()[(int)itemData->GetEquipType()];
+			bool IsEquiped = oldItem->GetIsEquip();
+
+			//장착 후 IsEquip이 true로 데이터가 바뀜
+			itemData->SetInventory(this);
+			itemData->Use(Player);
+
+			// 장착한 아이템이 존재했을 때 다시 인벤토리로 반환
+			if (IsEquiped)
 			{
-				const FUIItemDataInfo* ItemInfo = gameInst->FindUIItemInfo(ItemOldName);
-				if (ItemInfo)
+				const FString ItemOldName = oldItem->GetItemOldName();
+				UchuchuGameInstance* gameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
+				if (gameInst)
 				{
-					UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
-					ItemData->SetNameText(ItemInfo->m_ItemName);
-					ItemData->SetIconTex(ItemInfo->m_Thumbnail);
-					ItemData->SetMeshPath(ItemInfo->m_MeshPath);
-					ItemData->SetItemDesc(ItemInfo->m_ItemDesc);
-					ItemData->SetItemType(EItemType::Equip, ItemInfo->m_EquipType);
-					ItemData->SetPickMesh(ItemInfo->m_PickMesh);
-					AddItem(ItemData);
+					const FUIItemDataInfo* ItemInfo = gameInst->FindUIItemInfo(ItemOldName);
+					if (ItemInfo)
+					{
+						UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
+						ItemData->SetNameText(ItemInfo->m_ItemName);
+						ItemData->SetIconTex(ItemInfo->m_Thumbnail);
+						ItemData->SetMeshPath(ItemInfo->m_MeshPath);
+						ItemData->SetItemDesc(ItemInfo->m_ItemDesc);
+						ItemData->SetItemType(EItemType::Equip, ItemInfo->m_EquipType);
+						ItemData->SetPickMesh(ItemInfo->m_PickMesh);
+						AddItem(ItemData);
+					}
 				}
 			}
 		}

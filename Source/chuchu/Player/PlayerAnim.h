@@ -15,19 +15,19 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float m_Direction;
+		float	 m_Direction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		float m_Speed;
+		float	 m_Speed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))  //멤버변수에 붙일수 있음
-		bool m_Attack; //현재 공격상태 인지 아닌지
+		bool	 m_Attack; //현재 공격상태 인지 아닌지
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		bool	m_OnGround;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))  //멤버변수에 붙일수 있음
-		EPlayerAnimType m_AnimType;
+		EPlayerAnimType		m_AnimType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		float	m_FallRecoveryAdditive;

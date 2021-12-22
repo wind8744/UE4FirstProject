@@ -93,7 +93,8 @@ void AItemBox::ItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 				UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
 				ItemData->SetNameText(ItemInfo->m_ItemName);
 				ItemData->SetIconTex(ItemInfo->m_Thumbnail); 
-				ItemData->SetItemType(EItemType::Equip, EEquipType::WEAPON);
+				ItemData->SetMeshPath(ItemInfo->m_MeshPath);
+				ItemData->SetItemType(EItemType::Equip, ItemInfo->m_EquipType);
 				ItemData->SetIndex(0); //?
 				ItemData->SetPickMesh(ItemInfo->m_PickMesh);
 
@@ -101,6 +102,10 @@ void AItemBox::ItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 				if (gameMode)
 				{
 					gameMode->GetMainHUD()->GetInventory()->AddItem(ItemData);
+
+					//아이템을 먹었을 때 퀘스트 조건 체크
+					gameMode->GetMainHUD()->GetQuestWidget()->QuestCheck(EQuestType::Collection, m_ItemName);
+
 				}
 			}
 

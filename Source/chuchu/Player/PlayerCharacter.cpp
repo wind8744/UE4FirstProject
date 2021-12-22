@@ -167,7 +167,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	// =================
 	if (1 == m_DashFov) 
 	{
-		//카메라
 		float CameraFov = m_Camera->FieldOfView;
 		float alpha = DeltaTime * m_FovSpeed;
 		float RetValue = FMath::Lerp(CameraFov, m_TargetFov, alpha);
@@ -176,7 +175,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 	}
 	else if (2 == m_DashFov)
 	{
-		//카메라
 		float CameraFov = m_Camera->FieldOfView;
 		float alpha = DeltaTime * m_FovSpeed;
 		float inputfov = 88.f;
@@ -666,7 +664,37 @@ void APlayerCharacter::UseSkill(int32 Index) {}
 void APlayerCharacter::UseSkillFire(int32 Index) {}
 void APlayerCharacter::RemoveItem(EEquipType EquipmentType) {}
 void APlayerCharacter::EquipItem(EEquipType EquipmentType, const FString& EquipmentPath) {}
-void APlayerCharacter::UseItem() {}
+#include "../Effect/NormalEffect.h"
+void APlayerCharacter::UseItem() 
+{
+
+	FActorSpawnParameters	param;
+	param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; // 부딪히던 안부딪히던 무조건 불러오도록
+	ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),GetActorLocation(), GetActorRotation(), param);
+	Effect->LoadParticle(TEXT("ParticleSystem'/Game/FantasyVFXCollection/3_ParticleSystem/Buff/BasicBuff/P_BasicBuff_02.P_BasicBuff_02'"));
+
+	PrintViewport(3.f, FColor::Blue, (TEXT("Max hp")));
+	m_PlayerInfo.HP = 500;
+
+	// UI
+	AchuchuGameModeBase* GameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	//캐릭터 hp
+	if (IsValid(GameMode))
+	{
+		UMainHUD* MainHUD = GameMode->GetMainHUD();
+
+		if (IsValid(MainHUD))
+		{
+			UCharacterHUD* CharacterHUD = MainHUD->GetCharacterHUD();
+
+			if (IsValid(CharacterHUD))
+			{
+				CharacterHUD->SetHPPercent(m_PlayerInfo.HP / (float)m_PlayerInfo.HPMax);
+			}
+		}
+	}
+}
 void APlayerCharacter::ChangeWeaponSocket() {}
 void APlayerCharacter::Skill3Loop(){}
 

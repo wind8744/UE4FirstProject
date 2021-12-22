@@ -67,6 +67,8 @@ public:
 
 	void SetItemDesc(const FString& _Des) { m_ItemDesc = _Des; }
 
+	EItemType GetItemType() const { return m_ItemType; }
+
 	EEquipType GetEquipType() const { return m_EquipType; }
 
 	UTexture2D* GetIconTex()

@@ -30,6 +30,8 @@ public:
 
 public:
 	void SetMesh(UStaticMesh* _Mesh) { m_ItemMesh->SetStaticMesh(_Mesh); }
+
+	UFUNCTION()
 	void SetItemName(const FString& _Name) { m_ItemName = _Name; }
 
 	// * Main Controller »£√‚

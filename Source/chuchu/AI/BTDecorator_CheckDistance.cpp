@@ -11,9 +11,10 @@ UBTDecorator_CheckDistance::UBTDecorator_CheckDistance()
 	NodeName = TEXT("CheckDistance");
 }
 
-// 조건 체크 
-bool UBTDecorator_CheckDistance::CalculateRawConditionValue(
-	UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
+// 플레이어가 몬스터의 공격 범위 내에 있는지 아닌지  
+// true면  Attack Task 실행
+// false면 Target Trace Task 실행
+bool UBTDecorator_CheckDistance::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	bool result = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 

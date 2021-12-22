@@ -15,8 +15,8 @@ void AMeteorTrigger::BeginPlay()
 {
 	Super::BeginPlay(); //obj 클래스는 meteor라서 이 함수에 먼저 들어오고 다시 부모 함수로 들어간 후 끝나면 자식(여기)로 실행 parent -> child 
 
-	m_TriggerBeginDelegate.AddDynamic(this, &AMeteorTrigger::TriggerBegin);
-	m_TriggerEndDelegate.AddDynamic(this, &AMeteorTrigger::TriggerEnd);
+	m_DelegateTriggerBegin.AddDynamic(this, &AMeteorTrigger::TriggerBegin);
+	m_DelegateTriggerEnd.AddDynamic(this, &AMeteorTrigger::TriggerEnd);
 }
 
 // Called every frame

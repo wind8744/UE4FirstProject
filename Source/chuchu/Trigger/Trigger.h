@@ -7,7 +7,8 @@
 #include "Trigger.generated.h"
 
 //델리게이트 (인강 55) 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerDelegate); 
+//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FTriggerDelegate); 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDelegateTrigger);
 
 UCLASS(BlueprintType)
 class CHUCHU_API ATrigger : public AActor
@@ -27,20 +28,20 @@ protected:
 
 	//델리게이트 
 	UPROPERTY(BlueprintAssignable, Category = "Collision")
-		FTriggerDelegate	m_TriggerBeginDelegate;
+		FDelegateTrigger	m_DelegateTriggerBegin;
 
 	UPROPERTY(BlueprintAssignable, Category = "Collision")
-		FTriggerDelegate	m_TriggerEndDelegate;
+		FDelegateTrigger	m_DelegateTriggerEnd;
 
 public:
-	FTriggerDelegate& GetBeginDelegate()
+	FDelegateTrigger& GetBeginDelegate()
 	{
-		return m_TriggerBeginDelegate;
+		return m_DelegateTriggerBegin;
 	}
 
-	FTriggerDelegate& GetEndDelegate()
+	FDelegateTrigger& GetEndDelegate()
 	{
-		return m_TriggerEndDelegate;
+		return m_DelegateTriggerEnd;
 	}
 
 protected:
@@ -51,13 +52,9 @@ public:
 
 public:
 	UFUNCTION()
-		void TriggerBeginOverlap(UPrimitiveComponent* OverlapCom, AActor* OtherActor,
-			UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-			const FHitResult& SweepResult);
+		void TriggerBeginOverlap(UPrimitiveComponent* OverlapCom, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,const FHitResult& SweepResult);
 
 	UFUNCTION()
-		void TriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,
-			AActor* OtherActor, UPrimitiveComponent* OtherComp,
-			int32 OtherBodyIndex);
+		void TriggerEndOverlap(UPrimitiveComponent* OverlappedComponent,AActor* OtherActor, UPrimitiveComponent* OtherComp,int32 OtherBodyIndex);
 
 };
