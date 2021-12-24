@@ -16,7 +16,6 @@ void UInventory::NativeConstruct()
 
 	m_InventoryTile = Cast<UTileView>(GetWidgetFromName(TEXT("InventoryTile")));
 	m_InventorySlot= Cast<UTileView>(GetWidgetFromName(TEXT("InventorySlot")));
-	m_CloseButton = Cast<UButton>(GetWidgetFromName(TEXT("CloseButton")));
 	m_ItemInfoWidget = Cast<UItemInfo>(GetWidgetFromName(TEXT("UI_ItemInfo")));
 
 	m_InventoryTile->SetScrollbarVisibility(ESlateVisibility::Collapsed);
@@ -54,10 +53,12 @@ void UInventory::NativeConstruct()
 
 	m_MouseHovered = false;
 
+	m_ManaItem = false;
+	m_HealthItem = false;
+
 	// dynamic
 	m_InventoryTile->OnItemClicked().AddUObject(this, &UInventory::ItemClick);
 	m_InventoryTile->OnItemIsHoveredChanged().AddUObject(this, &UInventory::ItemHOvered);
-	m_CloseButton->OnClicked.AddDynamic(this, &UInventory::CloseButtonClick);
 }
 
 void UInventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -66,8 +67,7 @@ void UInventory::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 }
 
 // 마우스가 온 상태일때만
-FReply UInventory::NativeOnMouseMove(const FGeometry& InGeometry,
-	const FPointerEvent& InMouseEvent)
+FReply UInventory::NativeOnMouseMove(const FGeometry& InGeometry,const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseMove(InGeometry, InMouseEvent);
 
@@ -178,51 +178,32 @@ void UInventory::ItemHOvered(UObject* Data, bool Hovered)
 
 }
 
-
-void UInventory::CloseButtonClick()
-{
-	if (GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
-		SetVisibility(ESlateVisibility::SelfHitTestInvisible); //인벤토리가 보이도록
-
-	else
-	{
-		AchuchuGameModeBase* chuMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
-		chuMode->GetMainHUD()->CloseAllUI();
-
-		//SetVisibility(ESlateVisibility::Collapsed);
-
-		//m_Equipclass->CloseEquipUI();
-
-		//APlayerController* PController = GetWorld()->GetFirstPlayerController();
-		//PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
-		//PController->bShowMouseCursor = false;
-	}
-}
-
-void UInventory::CloseInvenUI()
-{
-	if (GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
-		SetVisibility(ESlateVisibility::SelfHitTestInvisible); //인벤토리가 보이도록
-
-	else
-	{
-		SetVisibility(ESlateVisibility::Collapsed);
-	}
-}
-
 bool UInventory::AddItem(UObject* Item)
 {
 	if (Items.Num() >= Capacity || !Item)
 		return false;
 
 	class UItemData* Itemdata = Cast<UItemData>(Item);
+	
+	if (Itemdata->GetItemType() == EItemType::Food)
+	{
+		for (int a = 0; a < Items.Num(); ++a)
+		{
+			if (Itemdata->GetNameText().Equals(Items[a]->GetNameText(), ESearchCase::CaseSensitive))
+			{
+				FString test1 = Itemdata->GetNameText();
+				PrintViewport(1.f, FColor::Red, test1);
+				Items[a]->CountUp();
+				return true;
+			}
+		}
+	}
 
 	Itemdata->OwningInventory = this;
 	Itemdata->m_World = GetWorld();
 	
-	Items.Add(Itemdata);
 	m_InventoryTile->AddItem(Item);
-
+	Items.Add(Itemdata);
 	return true;
 }
 bool UInventory::RemoveItem(UObject* Item)
@@ -230,6 +211,24 @@ bool UInventory::RemoveItem(UObject* Item)
 	if (Item)
 	{
 		class UItemData* Itemdata = Cast<UItemData>(Item);
+
+		if (Itemdata->GetItemType() == EItemType::Food)
+		{
+			for (int a = 0; a < Items.Num(); ++a)
+			{
+				if (Itemdata->GetNameText().Equals(Items[a]->GetNameText(), ESearchCase::CaseSensitive))
+				{
+					FString test1 = Itemdata->GetNameText();
+					PrintViewport(1.f, FColor::Red, test1);
+					int32 ret = Itemdata->CountDown();
+					if (ret>=0) //0개가 아니면 숫자만 다운
+					{
+						return true;
+					}
+				}
+			}	
+		}
+
 		Itemdata->OwningInventory = nullptr; // 인벤토리를 널
 		Itemdata->m_World = nullptr;
 
@@ -239,44 +238,4 @@ bool UInventory::RemoveItem(UObject* Item)
 		return true;
 	}
 	return false;
-}
-#include "Blueprint/WidgetBlueprintLibrary.h"
-FReply UInventory::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-	// Allows users to handle events and return information to the underlying UI layer.
-	FEventReply reply;
-	reply.NativeReply = Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-	reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, FKey("LeftMouseButton")); //왼쪽 마우스를 누르면 이벤트가 들어옴
-	//DetectDragIfPressed 이; 함수를 통해 밑의 NativeOnDragDetected함수가 호출됨
-
-	return reply.NativeReply;
-}
-
-#include "../UI/WidgetDragDropOperation.h"
-void UInventory::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
-{
-	Super::NativeOnDragDetected(InGeometry,InMouseEvent, OutOperation);
-
-	UWidgetDragDropOperation* Wigddo = Cast<UWidgetDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UWidgetDragDropOperation::StaticClass()));
-	//내가 만든 드래그드랍 클래스 갖고옴
-	
-	if (nullptr == Wigddo) 
-		return;
-
-	Wigddo->WidgetTodrag = this;
-	//옮길 위젯 (멤버변수로 저장)
-
-	Wigddo->MouseOffset = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-	//마우스 offset (멤버변수에 저장)
-
-	Wigddo->DefaultDragVisual = this;
-	//드래그 할 때 보일 위젯 
-
-	Wigddo->Pivot = EDragPivot::MouseDown;
-	//마우스 다운을 한 지점을 기준으로
-
-	OutOperation = Wigddo;
-	//outoperation의 참ㅁ조가 널이 아니라면 native on drop이 호출
-
-	this->RemoveFromParent(); //드래그 할 때 그 전에있던것은 삭제 
 }

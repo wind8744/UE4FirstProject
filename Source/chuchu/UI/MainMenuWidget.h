@@ -4,6 +4,7 @@
 
 #include "../GameInfo.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "MainMenuWidget.generated.h"
 /**
@@ -15,46 +16,25 @@ class CHUCHU_API UMainMenuWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	//	UButton* m_InventoryButton;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UButton* m_UIBUtton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UButton* m_QuestBUtton;
-
+		UTextBlock* m_TxtBlock;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UButton* m_SkillButton;
-
+		UTextBlock* m_TxtBlock2;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UButton* m_OptionButton;
+		UTextBlock* m_TxtBlock3;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UTextBlock* m_PotionTxt;
 
-	//class UInventoryList* m_InventoryList;
-	//class UInventoryTile* m_InventoryTile;
 
-	class UAuctionWidget* m_Auction;
-	class UInventory* m_Inventory;
-	class UEquipment* m_Equipment;
-	class UQuestWidget* m_QuestWidget;
+	class UCombineWidget* m_UIWidget;
 
 public:
-	//void SetInventoryList(class UInventoryList* List)
-	//{
-	//	m_InventoryList = List;
-	//}
-	void SetQuestWidget(class UQuestWidget* Quest)
+	void SetUIWidget(class UCombineWidget* Quest)
 	{
-		m_QuestWidget = Quest;
-	}
-	void SetAuction(class UAuctionWidget* Auction)
-	{
-		m_Auction = Auction;
-	}
-	void SetInventory(class UInventory* Inventory)
-	{
-		m_Inventory = Inventory;
-	}
-	void SetEquipment(class UEquipment* Equipment)
-	{
-		m_Equipment = Equipment;
+		m_UIWidget = Quest;
 	}
 
 protected:
@@ -63,11 +43,5 @@ protected:
 
 public:
 	UFUNCTION()
-		void OnEquipment();
-
-	UFUNCTION()
-		void OnInventory2();
-
-	UFUNCTION()
-		void OnQuestWidget();
+		void OnUIWidget();
 };

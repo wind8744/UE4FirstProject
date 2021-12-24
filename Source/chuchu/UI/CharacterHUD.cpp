@@ -9,10 +9,10 @@ void UCharacterHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	m_CharacterPic = Cast<UImage>(GetWidgetFromName(TEXT("CharacterPic")));
-	m_NameText = Cast<UTextBlock>(GetWidgetFromName(TEXT("Name")));
+	//m_CharacterPic = Cast<UImage>(GetWidgetFromName(TEXT("CharacterPic")));
+	m_NameText = Cast<UTextBlock>(GetWidgetFromName(TEXT("charname")));
 	m_HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HPBar")));
-	m_MPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("MPBar")));
+	//m_MPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("MPBar")));
 
 	/*if (m_NameDelegate.IsBound())
 	{
@@ -40,7 +40,7 @@ void UCharacterHUD::NativeConstruct()
 		//내거
 		//인스턴스에 이름 저장해놓은것 불러와서 ui에 set
 		UchuchuGameInstance* GameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
-		const FString playername = GameInst->GetPlayerInfoName();
+		const FString playername = "CharacterName";//GameInst->GetPlayerInfoName();		
 		SetName(playername);
 	}
 }

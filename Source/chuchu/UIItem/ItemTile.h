@@ -2,6 +2,7 @@
 
 #include "../GameInfo.h"
 #include "Components/Image.h"
+#include "Components/TextBlock.h"
 #include "Blueprint/UserWidget.h"
 #include "ItemTile.generated.h"
 
@@ -18,6 +19,12 @@ class CHUCHU_API UItemTile : public UUserWidget //2. 인벤토리 내 아이템 ui
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UImage* m_IconImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UTextBlock* m_IconCount;
+
+	class UItemData* m_ItemData;
+	bool m_IsFood;
 
 protected:
 	virtual void NativeConstruct();

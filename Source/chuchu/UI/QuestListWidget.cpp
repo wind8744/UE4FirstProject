@@ -39,7 +39,6 @@ void UQuestListWidget::Select(bool Enable)
 		FLinearColor	color(1.f, 0.7f, 0.f, 0.5f);
 		m_Selection->SetBrushTintColor(color);
 	}
-
 	else
 	{
 		FLinearColor	color(0.2f, 0.2f, 0.2f, 0.f);
@@ -56,7 +55,6 @@ void UQuestListWidget::MouseOn(bool Enable)
 			FLinearColor	color(0.2f, 0.2f, 0.2f, 0.5f);
 			m_Selection->SetBrushTintColor(color);
 		}
-
 		else
 		{
 			FLinearColor	color(0.2f, 0.2f, 0.2f, 0.f);

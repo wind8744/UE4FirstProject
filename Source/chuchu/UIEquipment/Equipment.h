@@ -20,18 +20,8 @@ class CHUCHU_API UEquipment : public UUserWidget
 	GENERATED_BODY()
 	
 protected:
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	//	UEquipTile* m_EquipmentTile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		TArray<UEquipTile*> m_EquipTileArry;
-
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	//	UItemDescWidget* m_ItemDescWidget;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UButton* m_CloseButton;
 
 	class UInventory* m_Inventoryclass; //인벤토리
 
@@ -45,16 +35,5 @@ public:
 protected:
 	virtual void NativeConstruct(); //생성자
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
-	//virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
-	
-		//widget Drag&drop
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation); //드래그 감지
-
-public:
-	UFUNCTION()
-		void CloseButtonClick();
-
-	void CloseEquipUI();
 
 };

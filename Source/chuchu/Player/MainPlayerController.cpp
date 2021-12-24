@@ -28,10 +28,10 @@ void AMainPlayerController::SetupInputComponent()
 	//InputComponent->BindAction(TEXT("PickItem"), EInputEvent::IE_Released, this, &AMainPlayerController::MouseReleased);
 }
 
+// UI키 눌렀을 때 Widget ON
 void AMainPlayerController::UIKey()
 {
 	//m_IsUIMode = m_IsUIMode == true ? false : true;
-
 	//if (m_IsUIMode)
 	{
 		SetInputMode(FInputModeUIOnly());
@@ -75,9 +75,7 @@ void AMainPlayerController::PlayerTick(float DeltaTime)
 	}
 	*/
 
-	//건물 충돌체 가져와서 캐릭터 실루엣 보여주기 10_12강의
-	int a = 1;
-
+	//건물 충돌체 가져와서 캐릭터 실루엣 보여주기 - 10월12일
 	for (auto& CollisionActor : m_CollisionEnvironmentActor)
 	{
 		CollisionActor->SetCameraCollision(false);

@@ -2,91 +2,69 @@
 
 
 #include "MainMenuWidget.h"
-#include "InventoryList.h"
-#include "InventoryTile.h"
-#include "QuestWidget.h"
-#include "../UIItem/Inventory.h"
-#include "../UIEquipment/Equipment.h"
+#include "CombineWidget.h"
+#include "../chuchuGameModeBase.h"
+#include "../UIItem/ItemData.h"
 
 void UMainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	//m_InventoryButton = Cast<UButton>(GetWidgetFromName(TEXT("InventoryButton"))); //인벤토리버튼
-	//m_CharacterStateButton = Cast<UButton>(GetWidgetFromName(TEXT("CharacterStateButton")));
-	m_SkillButton = Cast<UButton>(GetWidgetFromName(TEXT("SkillButton")));
-	m_OptionButton = Cast<UButton>(GetWidgetFromName(TEXT("OptionButton")));
-	m_QuestBUtton = Cast<UButton>(GetWidgetFromName(TEXT("QuestButton")));
+	m_UIBUtton = Cast<UButton>(GetWidgetFromName(TEXT("UIButton")));
+	m_TxtBlock = Cast<UTextBlock>(GetWidgetFromName(TEXT("CoolTimeText1"))); //skill1
+	m_TxtBlock2 = Cast<UTextBlock>(GetWidgetFromName(TEXT("CoolTimeText2"))); //skill2
+	m_TxtBlock3 = Cast<UTextBlock>(GetWidgetFromName(TEXT("CoolTimeText3"))); //skill3
+	m_PotionTxt = Cast<UTextBlock>(GetWidgetFromName(TEXT("CoolTimeText4"))); //potion
 
-	//m_InventoryButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory); //인벤토리 버튼이 눌릴때 onInventory함수가 호출
-	//m_CharacterStateButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventoryTile); //
 
-	// 실제로 쓰는것
-	m_SkillButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnEquipment); //장비창
-	m_OptionButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnInventory2); //인벤토리
-	m_QuestBUtton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnQuestWidget); //퀘스트창
-
+	m_UIBUtton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnUIWidget); //퀘스트창
 }
 
 void UMainMenuWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+	
+	//플레이어에 얻어와서 쿨타임 표시
+	m_TxtBlock->SetText(FText::FromString(" ")); 
+	m_TxtBlock2->SetText(FText::FromString(" "));
+	m_TxtBlock3->SetText(FText::FromString(" "));
+	
+	//인벤토리에 얻어와서 포션 수 표시
+
+	AchuchuGameModeBase* gameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+	if (gameMode)
+	{
+		bool finddata = false;
+		const TArray<UItemData*> items =  gameMode->GetMainHUD()->GetInventory()->GetItems();
+		for (int a = 0; a < items.Num(); ++a)
+		{
+			if (items[a]->GetNameText().Equals("Health", ESearchCase::CaseSensitive))
+			{
+				int32 ret = items[a]->GetIndex();
+				m_PotionTxt->SetText(FText::FromString(FString::FromInt(ret+1)));
+				finddata = true;
+				break;
+			}
+		}
+		if(!finddata)
+		{
+			m_PotionTxt->SetText(FText::FromString("0"));
+		}
+
+	}
+	
+
+
 }
 
 // ============================
 // 버튼이 눌릴때 호출되는 함수들
 // ============================
-void UMainMenuWidget::OnQuestWidget()
+void UMainMenuWidget::OnUIWidget()
 {
-	if (m_QuestWidget->GetVisibility() == ESlateVisibility::Collapsed)
-		m_QuestWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	if (m_UIWidget->GetVisibility() == ESlateVisibility::Collapsed)
+		m_UIWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 	else
-		m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
+		m_UIWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
-
-void UMainMenuWidget::OnEquipment()
-{
-	if (m_Equipment->GetVisibility() == ESlateVisibility::Collapsed)
-		m_Equipment->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_Equipment->SetVisibility(ESlateVisibility::Collapsed);
-}
-
-void UMainMenuWidget::OnInventory2()
-{
-	if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed)
-		m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
-}
-
-/*
-void UMainMenuWidget::OnInventory() //인벤토리 버튼이 눌릴때 onInventory함수가 호출
-{
-	if (m_InventoryList->GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
-		m_InventoryList->SetVisibility(ESlateVisibility::SelfHitTestInvisible); //인벤토리가 보이도록
-
-	else
-		m_InventoryList->SetVisibility(ESlateVisibility::Collapsed);
-
-
-	//if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed) //인벤토리가 가려져있을때 호출되면
-	//	m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible); //인벤토리가 보이도록
-
-	//else
-	//	m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
-	
-}
-
-void UMainMenuWidget::OnInventoryTile()
-{
-	if (m_InventoryTile->GetVisibility() == ESlateVisibility::Collapsed)
-		m_InventoryTile->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_InventoryTile->SetVisibility(ESlateVisibility::Collapsed);
-}
-*/

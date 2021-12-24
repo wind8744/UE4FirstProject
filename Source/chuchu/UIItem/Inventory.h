@@ -34,9 +34,6 @@ protected:
 		UItemInfo* m_ItemInfoWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UButton* m_CloseButton;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		int32 Capacity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -45,6 +42,10 @@ protected:
 	TArray<UObject*>	m_SlotArray;
 
 	int32	m_ItemCount;
+	
+	bool m_HealthItem;
+	bool m_ManaItem;
+	
 	bool	m_MouseHovered;
 
 	class UEquipment* m_Equipclass; //장비창
@@ -52,15 +53,12 @@ protected:
 public:
 	void SetEquipClass(UEquipment* _class) { m_Equipclass = _class; }
 	UEquipment* GetEquipClass() { return m_Equipclass; }
+	const TArray<UItemData*> GetItems() { return Items; }
 
 protected:
 	virtual void NativeConstruct();
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
-
-	//widget Drag&drop
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation); //드래그 감지
 
 public:
 	bool AddItem(UObject* Item);
@@ -76,9 +74,4 @@ public:
 
 	UFUNCTION()
 		void ItemHOvered(UObject* Data, bool Hovered);
-
-	UFUNCTION()
-		void CloseButtonClick();
-	void CloseInvenUI(); //장비창에서 창 닫을때
-	
 };

@@ -35,7 +35,7 @@ protected:
 		FString	m_IconTexPath;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		int32	m_Index;
+		int32	m_Index; //포션개수
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		FString m_ItemDesc;
@@ -103,4 +103,9 @@ public:
 	}
 
 	void Use(class APlayerCharacter* character); //virtual (class AGhostLady* character);
+
+	//포션 갯수
+	int32 CountUp() { return ++m_Index; }
+	int32 CountDown(){ return --m_Index; }
+
 };

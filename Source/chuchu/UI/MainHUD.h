@@ -3,6 +3,7 @@
 #pragma once
 
 #include "../GameInfo.h"
+#include "CombineWidget.h"
 #include "CharacterHUD.h"
 #include "MainMenuWidget.h"
 #include "InventoryList.h"
@@ -35,12 +36,8 @@ protected:
 		UMainMenuSkillWidget* m_MainMenuSkill;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		UAuctionWidget* m_Auction;
+		UCombineWidget* m_CombineWidget;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		USlider* m_LandScapeSlider;
-
-	//
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UInventory* m_Inventory;
 
@@ -49,9 +46,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		UQuestWidget* m_QuestWidget;
-
-	class UMaterialParameterCollection* m_LandScapeCollection;
-	class UMaterialParameterCollectionInstance* m_LandScapeCollectionInst;
 
 public:
 	UCharacterHUD* GetCharacterHUD()
@@ -64,11 +58,6 @@ public:
 		return m_MainMenu;
 	}
 
-	//UInventoryList* GetInventoryList()
-	//{
-	//	return m_InventoryList;
-	//}
-
 	UInventory* GetInventory() { return m_Inventory; }
 	UEquipment* GetEquipment() { return m_Equipment; }
 	UQuestWidget* GetQuestWidget() { return m_QuestWidget; }
@@ -80,9 +69,5 @@ protected:
 	virtual void NativeConstruct(); //생성 ( 소멸도 있음 )
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime); //틱마다 들어오는 함수
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation);
-
-public:
-	UFUNCTION()
-		void LandScapeSliderValue(float Value);
 
 };

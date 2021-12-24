@@ -11,7 +11,7 @@
 
 UItemData::UItemData()
 {
-
+	m_Index = 0;
 }
 
 void UItemData::Use(class APlayerCharacter* character) //(AGhostLady* character)

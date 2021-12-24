@@ -13,51 +13,27 @@ void UMainHUD::NativeConstruct()
 	m_CharacterHUD = Cast<UCharacterHUD>(GetWidgetFromName(TEXT("UI_CharacterHUD")));
 	m_MainMenuSkill = Cast<UMainMenuSkillWidget>(GetWidgetFromName(TEXT("UI_MainMenuSkill")));
 	m_MainMenu = Cast<UMainMenuWidget>(GetWidgetFromName(TEXT("UI_MainMenu")));
-	m_Inventory = Cast<UInventory>(GetWidgetFromName(TEXT("UI_Inventory")));
-	m_Equipment = Cast<UEquipment>(GetWidgetFromName(TEXT("UI_Equipment")));
-	m_QuestWidget = Cast<UQuestWidget>(GetWidgetFromName(TEXT("UI_QUest")));
-	
-	//test
-	m_Auction = Cast<UAuctionWidget>(GetWidgetFromName(TEXT("UI_AuctionWidget")));
-	m_LandScapeSlider = Cast<USlider>(GetWidgetFromName(TEXT("LandScapeTiling")));
+	m_CombineWidget = Cast<UCombineWidget>(GetWidgetFromName(TEXT("UI_Combine1")));
 
-	//MainHUD 블루프린트에서 LandScapeTiling의 변수인지 체크 해제 한 후 디테일에서 이벤트 함수 이름들을 확인할 수 있다.
-	//함수 이름 확인 후 다시 변수인지 체크 후 동적할당 하여 사용하면 됨
-	//값 바뀔때마다 함수를 호출함
-	m_LandScapeSlider->OnValueChanged.AddDynamic(this, &UMainHUD::LandScapeSliderValue);
+	//for drap &drop 상호작용을 위해
+	Visibility = ESlateVisibility::Visible;
+	m_CombineWidget->Visibility = ESlateVisibility::Collapsed;
 
-	m_LandScapeCollection = LoadObject<UMaterialParameterCollection>(GetWorld(), TEXT("MaterialParameterCollection'/Game/LandScape/MCMainLandScapeData.MCMainLandScapeData'"));
+	m_Inventory = m_CombineWidget->GetInventoryWidget();
+	m_Equipment = m_CombineWidget->GetEquipmentWidget();
+	m_QuestWidget = m_CombineWidget->GetQuestWidget();
 
-	//인스턴스 만드는 방법 , 인스턴스 객체를 하나 만들어줌, 실제로 값을 컨트롤 하는 것은 인스턴트가 해줌
-	m_LandScapeCollectionInst = GetWorld()->GetParameterCollectionInstance(m_LandScapeCollection);
-
-	m_MainMenu->SetAuction(m_Auction);
-	m_MainMenu->SetInventory(m_Inventory);
-	m_MainMenu->SetEquipment(m_Equipment);
-	m_MainMenu->SetQuestWidget(m_QuestWidget);
-
-	/*m_MainMenu->SetInventoryButtonClickCallback<UMainHUD>(this,
-		&UMainHUD::InventoryButtonClick);*/
+	m_MainMenu->SetUIWidget(m_CombineWidget);
 
 	//장비창과 인벤토리에 서로의 주소값 세팅
 	m_Inventory->SetEquipClass(m_Equipment);
 	m_Equipment->SetInventoryClass(m_Inventory);
 	m_Equipment->InitEquipment();
-
-	//for drap &drop 상호작용을 위해
-	Visibility = ESlateVisibility::Visible;
 }
 
 void UMainHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-}
-
-void UMainHUD::LandScapeSliderValue(float Value)
-{
-	//제대로 되는건지 아닌지 불값으로 리턴해줌 
-	//들어온 값(슬라이더로 조절한 값)을 랜드스캐이프 데이타의 타일링 data값에 set
-	bool Find = m_LandScapeCollectionInst->SetScalarParameterValue(TEXT("Tiling"), Value);
 }
 
 #include "../UI/WidgetDragDropOperation.h"
@@ -84,47 +60,18 @@ bool UMainHUD::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& I
 // 메인 플레이어 컨트롤 클래스에서 ui 키를 눌렀을 때 불리는 함수
 void UMainHUD::PopupUI()
 {
-	if (m_Equipment->GetVisibility() == ESlateVisibility::Collapsed)
-		m_Equipment->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+	if(m_CombineWidget->GetVisibility() == ESlateVisibility::Collapsed)
+		m_CombineWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 
 	else
-		m_Equipment->SetVisibility(ESlateVisibility::Collapsed);
-
-
-	if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed)
-		m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
-
-	if (m_QuestWidget->GetVisibility() == ESlateVisibility::Collapsed)
-		m_QuestWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	else
-		m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
+		m_CombineWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UMainHUD::CloseAllUI()
 {
-
-	m_Equipment->SetVisibility(ESlateVisibility::Collapsed);
-	m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
-	m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
+	m_CombineWidget->SetVisibility(ESlateVisibility::Collapsed);
 
 	APlayerController* PController = GetWorld()->GetFirstPlayerController();
 	PController->SetInputMode(FInputModeGameOnly()); // 커서 없어지고 마우스 방향으로 카메라 회전
 	PController->bShowMouseCursor = false;
-
-	//if (m_Inventory->GetVisibility() == ESlateVisibility::Collapsed)
-	//	m_Inventory->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	//else
-	//	m_Inventory->SetVisibility(ESlateVisibility::Collapsed);
-
-	//if (m_QuestWidget->GetVisibility() == ESlateVisibility::Collapsed)
-	//	m_QuestWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
-
-	//else
-	//	m_QuestWidget->SetVisibility(ESlateVisibility::Collapsed);
-
 }

@@ -94,8 +94,7 @@ void AItemBox::ItemBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 				ItemData->SetNameText(ItemInfo->m_ItemName);
 				ItemData->SetIconTex(ItemInfo->m_Thumbnail); 
 				ItemData->SetMeshPath(ItemInfo->m_MeshPath);
-				ItemData->SetItemType(EItemType::Equip, ItemInfo->m_EquipType);
-				ItemData->SetIndex(0); //?
+				ItemData->SetItemType(ItemInfo->m_ItemType, ItemInfo->m_EquipType);
 				ItemData->SetPickMesh(ItemInfo->m_PickMesh);
 
 				AchuchuGameModeBase* gameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
