@@ -208,10 +208,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 			param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 			// Ghost Trail 생성
-			AGhostTrail* Trail = GetWorld()->SpawnActor<AGhostTrail>(AGhostTrail::StaticClass(),
-				GetMesh()->GetComponentLocation(),
-				GetMesh()->GetComponentRotation(), param);
-
+			AGhostTrail* Trail = GetWorld()->SpawnActor<AGhostTrail>(AGhostTrail::StaticClass(),GetMesh()->GetComponentLocation(),GetMesh()->GetComponentRotation(), param);
 			Trail->SetMesh(m_PlayerMesh);
 			Trail->CopyAnimation(GetMesh()); //스켈레톤의 현재 재생중인 포즈를 가지고 온다
 		}

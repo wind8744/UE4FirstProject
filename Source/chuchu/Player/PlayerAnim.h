@@ -141,7 +141,6 @@ public:
 
 	UFUNCTION()
 		void AnimNotify_TimeDelayStart(); // skill4 카메라 쉐이크 이펙트
-
 	UFUNCTION()
 		void AnimNotify_TimeDelayEnd();   // skill4 카메라 쉐이크 이펙트
 

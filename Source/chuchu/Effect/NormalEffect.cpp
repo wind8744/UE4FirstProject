@@ -53,6 +53,8 @@ void ANormalEffect::LoadParticle(const FString& Path)
 
 	if (Particle)
 		m_ParticleSystem->SetTemplate(Particle);
+	
+		
 }
 void ANormalEffect::LoadSound(const FString& Path)
 {

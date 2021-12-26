@@ -54,7 +54,7 @@ AGhostLady::AGhostLady()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill1Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill1.AMGhostLadySkill1'"));
 	if (Skill1Asset.Succeeded())
 		m_SkillMontageArray.Add(Skill1Asset.Object);
-
+	
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> Skill2Asset(TEXT("AnimMontage'/Game/Player/GhostLady/Skill/AMGhostLadySkill2.AMGhostLadySkill2'"));
 	if (Skill2Asset.Succeeded())
 		m_SkillMontageArray.Add(Skill2Asset.Object);
@@ -106,7 +106,8 @@ AGhostLady::AGhostLady()
 		m_Trail->SetTemplate(TrailAsset.Object);
 
 	// Dash Asset
-	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> DashTrailAsset(TEXT("NiagaraSystem'/Game/BlinkAndDashVFX/VFX_Niagara/NS_Dash_Vampire.NS_Dash_Vampire'"));
+	//static ConstructorHelpers::FObjectFinder<UNiagaraSystem> DashTrailAsset(TEXT("NiagaraSystem'/Game/BlinkAndDashVFX/VFX_Niagara/NS_Dash_Vampire.NS_Dash_Vampire'"));
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> DashTrailAsset(TEXT("NiagaraSystem'/Game/BlinkAndDashVFX/VFX_Niagara/NS_Dash_Ghost.NS_Dash_Ghost'"));
 	if (DashTrailAsset.Succeeded())
 		m_DashTrail = DashTrailAsset.Object;
 
@@ -269,11 +270,11 @@ void AGhostLady::Dash()
 	//if (m_DashTrail)
 	//	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DashTrail, GetActorLocation(), GetActorForwardVector().Rotation());
 
-	FVector ActorVelovity = GetVelocity();
+	FVector ActorVelovity = GetVelocity(); //움직이는 방향으로의 속도
 	ActorVelovity.Normalize();
 
 	if (m_DashTrail)
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DashTrail, GetActorLocation(), ActorVelovity.Rotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), m_DashTrail, GetActorLocation(), ActorVelovity.Rotation(),FVector(0.7f,0.1f,0.1f));
 
 
 	//비동기 에셋 로딩
@@ -309,11 +310,12 @@ void AGhostLady::OnComponentBeginOverlapWeapon(UPrimitiveComponent* OverlappedCo
 		FActorSpawnParameters	param;
 		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),
-			SweepResult.ImpactPoint, SweepResult.ImpactNormal.Rotation(), param);
-
-		// 나이아가라 애셋을 로딩한다.
-		Effect->LoadNiagaraAsync(TEXT("GhostLadySlash")); //GhostLadySlash
+		FVector ActorForVec = GetActorForwardVector(); //이펙트가 몬스터와 플레이어(카메라 방향) 사이에 스폰되도록
+		FVector EffectLoc = FVector(Mon->GetActorLocation().X- 130 * ActorForVec.X, Mon->GetActorLocation().Y - 130 * ActorForVec.Y, Mon->GetActorLocation().Z-100 * ActorForVec.Z); // Mon->GetActorLocation() + 100 * GetActorForwardVector().Normalize()
+		ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(), EffectLoc, Mon->GetActorRotation(), param);
+		
+		//파티클
+		Effect->LoadParticleAsync(TEXT("GhostLadyHit")); 		//Effect->LoadNiagaraAsync(TEXT("GhostLadyHit")); //나이아가라
 
 		// Sound
 		//Effect->LoadSoundAsync(TEXT("HitNormal"));
@@ -462,9 +464,6 @@ void AGhostLady::Skill1()
 {
 	if (!m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[0]))
 	{
-		// Ghost Trail On
-		OnGhostTrail();
-
 		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[0], 0.f);
 		m_AnimInstance->Montage_Play(m_SkillMontageArray[0]);
 	}
@@ -473,6 +472,9 @@ void AGhostLady::Skill2()
 {
 	if (m_Skill2Enable && !m_AnimInstance->Montage_IsPlaying(m_SkillMontageArray[1]))
 	{
+		// Ghost Trail On
+		OnGhostTrail();
+
 		m_AnimInstance->Montage_SetPosition(m_SkillMontageArray[1], 0.f);
 		m_AnimInstance->Montage_Play(m_SkillMontageArray[1]);
 	}
@@ -550,6 +552,18 @@ void AGhostLady::UseSkill()
 			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.2f,false);	//플레이어 점프
 			GetWorldTimerManager().SetTimer(m_Skill2Handle, this, &AGhostLady::InitSkill2, m_Skill2CoolTime, false); 			//재사용 대기시간
 
+			// SOund Effect
+			FActorSpawnParameters	param;
+			param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),GetActorLocation(), GetActorRotation(), param);
+			Effect->LoadSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
+
+			//Effect
+			UNiagaraSystem* NSHit = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/sA_StylizedSwordSet/Fx/NS_Ulti_lv2.NS_Ulti_lv2'")));
+			if (NSHit)
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NSHit, GetActorLocation() + GetActorForwardVector() * 300.f, GetActorRotation() + FRotator(0, 0.f, 0));// GetActorRotation());
+
+
 			break;
 		}
 		case 3: //키다운 공격
@@ -579,20 +593,31 @@ void AGhostLady::UseSkill()
 
 			LaunchGhostLady(FVector(m_Camera->GetForwardVector().X, m_Camera->GetForwardVector().Y, 1.f), 500.f, 1.f ,false);
 
-			//동기 에셋 로딩
-			UNiagaraSystem* particlens = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/sA_StylizedSwordSet/Fx/NS_Slash_UptoDown_Lv3_2.NS_Slash_UptoDown_Lv3_2'")));
-			if (particlens)
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), particlens, GetActorLocation(),GetActorForwardVector().Rotation());
+			// Effect
+			FActorSpawnParameters	param;
+			param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			/*	
+			*	Effect TEST 
+			* 
+				UNiagaraSystem* NSHit = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/sA_StylizedSwordSet/Fx/NS_Slash_3Combo3.NS_Slash_3Combo3'")));
+				if (NSHit)
+					UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NSHit, GetActorLocation() + GetActorForwardVector() * 300.f, GetActorRotation() + FRotator(0,-90.f,0));// GetActorRotation());
+			*/
+
+			// 이펙트 비동기 에셋 로딩, 플레이어 보는 방향 앞쪽에 스킬을 스폰하도록
+			ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(), GetActorLocation() + GetActorForwardVector() * 70.f, GetActorRotation() + FRotator(0, -90.f, 0), param);
+			Effect->LoadNiagaraAsync(TEXT("GhostLadySkill4Slash"));
 
 			GhostLadySkill4();
-
+			
 			break;
 		}
 		default:
 			break;
 	}
 
-}
+}	
 
 void AGhostLady::LaunchGhostLady(const FVector _launchVelocity, float _distance,float _initTime, bool _FrictionFactor)
 {
@@ -618,27 +643,22 @@ void AGhostLady::InitLaunchGhostLady()
 
 void AGhostLady::GhostLadySkill4()
 {
-	// 충돌체
 	FHitResult result2;
 	FVector	PlayerLoc = GetActorLocation();
+	PlayerLoc.Z += 300.f;
 	FVector	Forward = GetActorForwardVector();
 
 	FCollisionQueryParams	params(NAME_None, false, this); //충돌을 위한 파라미터들 
 
-	// 근접공격으로 이 타이밍에 충돌처리를 해주도록 한다.
-	TArray<FHitResult>	HitResultArray; //t어래이 타입으로 hit결과 배열을 만들어줌 , 충돌을 한 뒤 충돌의 결과값을 저장하는 구조체
-	//impactpoint는 부딪힌 위치 normal은 부딪힌 방향 
+	TArray<FHitResult>	HitResultArray;
 
 	FVector AttackBox;
 	AttackBox.X = 300.f;
 	AttackBox.Y = 300.f;
-	AttackBox.Z = 300.f;
+	AttackBox.Z = 100.f;
 
 	bool Sweep = GetWorld()->SweepMultiByChannel(HitResultArray, PlayerLoc, //멅티는 여러마리 싱글은 한마리 //두번째 인자는 충돌 시작점	
-		PlayerLoc, FQuat::Identity, //공격 거리, 회전정보가 기본 
-		ECollisionChannel::ECC_GameTraceChannel3, FCollisionShape::MakeBox(AttackBox),//MakeSphere(m_PlayerInfo.AttackDistance), //engineTrace사용xxx ,
-		params);
-
+		PlayerLoc, FQuat::Identity, ECollisionChannel::ECC_GameTraceChannel3, FCollisionShape::MakeBox(AttackBox),params);
 
 #if ENABLE_DRAW_DEBUG
 	PrintViewport(1.f, FColor::Yellow, TEXT("Attack"));
@@ -650,28 +670,20 @@ void AGhostLady::GhostLadySkill4()
 	for (auto& result : HitResultArray)
 	{
 		FActorSpawnParameters	param;
-		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn; // 부딪히던 안부딪히던 무조건 불러오도록
+		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-		ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(),
-			result.ImpactPoint, result.ImpactNormal.Rotation(), param); //위치정보, 회전정보(어느각도?:부딪혔을때 방향벡터의 반대방향), 방향벡터를 회전정보로 바꾸어줌, 위에서 불러온 파라미터 정보 
-
-		// 애셋을 로딩한다.
-		//동기 에셋 로딩
-		UNiagaraSystem* NSHit = LoadObject<UNiagaraSystem>(GetWorld(), (TEXT("NiagaraSystem'/Game/StrikeVFX/FX/FX_AshStrike1.FX_AshStrike1'")));
-		if (NSHit)
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NSHit, result.ImpactPoint, result.ImpactNormal.Rotation());
-
+		FVector ActorForVec = GetActorForwardVector();
+		FVector EffectLoc = FVector(result.ImpactPoint.X- 130 * ActorForVec.X, result.ImpactPoint.Y - 130 * ActorForVec.Y, result.ImpactPoint.Z-100 * ActorForVec.Z);
+		ANormalEffect* Effect = GetWorld()->SpawnActor<ANormalEffect>(ANormalEffect::StaticClass(), EffectLoc, result.ImpactNormal.Rotation(), param);
 		
-
+		//파티클
+		Effect->LoadParticleAsync(TEXT("GhostLadyHit")); 		//Effect->LoadNiagaraAsync(TEXT("GhostLadyHit")); //나이아가라
 		// Sound
 		Effect->LoadSoundAsync(TEXT("HitNormal"));
-		//Effect->LoadSound(TEXT("SoundWave'/Game/Sound/Fire1.Fire1'"));
-
-		// 데미지를 전달한다.
+		// 데미지를 전달.
 		FDamageEvent	DmgEvent;
-		//최종 데미지
 		float Damage = result.GetActor()->TakeDamage(m_PlayerInfo.Attack, DmgEvent, GetController(), this);
-
+		
 	}
 
 

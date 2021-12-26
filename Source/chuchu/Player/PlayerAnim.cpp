@@ -220,7 +220,9 @@ void UPlayerAnim::InitWeaponAnimPose()
 	m_AnimType = EPlayerAnimType::Ground;
 }
 
-
+// =======================
+// Ghost Lady Skill Notify
+// =======================
 void UPlayerAnim::AnimNotify_SkillStart()
 {
 	m_Attack = false;
@@ -229,13 +231,17 @@ void UPlayerAnim::AnimNotify_SkillStart()
 	if (Player)
 	{
 		Player->UseSkill();
-		Player->AttackEnd();
 	}
 }
 
 void UPlayerAnim::AnimNotify_SkillEnd()
 {
 	m_AnimType = EPlayerAnimType::Ground;
+	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
+	if (Player)
+	{
+		Player->AttackEnd();
+	}
 }
 
 void UPlayerAnim::AnimNotify_LoopStart()
@@ -255,7 +261,7 @@ void UPlayerAnim::AnimNotify_Skill2Shake()
 void UPlayerAnim:: AnimNotify_TimeDelayStart()
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
-	Player->TimeDilation(0.2f);
+	//Player->TimeDilation(0.2f);
 	// Ghost Trail On
 	// ++ 카메라 확대 및 이동? 그런것도 추가하면 좋을것 같음
 }
@@ -263,5 +269,5 @@ void UPlayerAnim:: AnimNotify_TimeDelayStart()
 void UPlayerAnim::AnimNotify_TimeDelayEnd()
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
-	Player->TimeDilation(1.f);
+	//Player->TimeDilation(1.f);
 }

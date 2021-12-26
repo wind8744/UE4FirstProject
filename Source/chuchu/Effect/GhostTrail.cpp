@@ -20,10 +20,10 @@ AGhostTrail::AGhostTrail()
 	if (GhostMtrlAsset.Succeeded())
 		m_GhostMaterial = GhostMtrlAsset.Object;
 
-	m_LifeTime = 0.5f; //살
+	m_LifeTime = 0.2f; //살
 	m_GhostType = EGhostTrailType::Fade; //fade를 많이 씀
 
-	m_FadeTime = 3.f; //라이프 타임 후부터 흘러가는 시간
+	m_FadeTime = 0.7f; //라이프 타임 후부터 흘러가는 시간
 	m_FadeTimeAcc = 0.f; //누적타임
 }
 
