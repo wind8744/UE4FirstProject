@@ -33,7 +33,9 @@ public:
 	FTimerHandle		m_OriMatTimer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	float m_TEST;
+	float m_Atime;
+
+	bool m_EnableAI;
 
 protected:
 	// Called when the game starts or when spawned
@@ -45,7 +47,7 @@ public:
 
 	virtual void NormalAttack();
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser);
-
+	virtual void Death();
 protected:
 	void MakeOriMaterial();
 

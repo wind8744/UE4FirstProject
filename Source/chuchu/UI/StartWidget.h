@@ -16,22 +16,24 @@ class CHUCHU_API UStartWidget : public UUserWidget
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UButton* m_StartButton;
+		UButton* m_StartButton;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UButton* m_QuitButton;
+		UButton* m_QuitButton;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		class UCharacterNameInputWidget* m_NameInput;
 	//start animation
 	//UPROPERTY(meta = (BindWidgetAnim), meta = (AllowPrivateAccess = "true"))
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	UWidgetAnimation* m_StartButtonMouseOn; //이름 똑같아야함
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	//UWidgetAnimation* m_StartButtonMouseOn; //이름 똑같아야함
 
 protected:
 	virtual void NativeConstruct();
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 protected:
-	void BindingAnimations();
+	//void BindingAnimations();
 
 public:
 	UFUNCTION()

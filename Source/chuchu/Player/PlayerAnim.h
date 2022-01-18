@@ -135,6 +135,10 @@ public:
 
 	UFUNCTION()
 		void AnimNotify_Skill2Shake();    // skill2 카메라 쉐이크 이펙트
+	UFUNCTION()
+		void AnimNotify_Skill2Effect();
+	UFUNCTION()
+		void AnimNotify_Skill2EffectEnd();
 
 	UFUNCTION()						      
 		void AnimNotify_LoopStart();      // skill3 키다운 몽타주 루프

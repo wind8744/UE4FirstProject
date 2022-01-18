@@ -19,7 +19,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<UStartWidget>	m_StartHUDClass; //À§Á¬ Å¬·¡½º 
+		TSubclassOf<UStartWidget>	m_MainStartHUDClass; //À§Á¬ Å¬·¡½º 
 
 	UStartWidget* m_StartHUD;
 

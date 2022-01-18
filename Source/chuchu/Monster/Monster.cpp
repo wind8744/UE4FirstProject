@@ -59,9 +59,8 @@ AMonster::AMonster()
 
 	m_DissolveRange = m_DissolveMax - m_DissolveMin;
 
-
-	//test
-	m_DropItemArray.Add(TEXT("GreatSword"));
+	// 드랍 아이템
+	//m_DropItemArray.Add(TEXT("GreatSword"));
 }
 
 // Called when the game starts or when spawned
@@ -97,8 +96,8 @@ void AMonster::BeginPlay()
 		}
 
 	}
-
-	m_AnimInstance = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance()); //몬스터의 애니메이션 인스턴스를 받아놓음 이것을 이용해서 애니 체인지
+	//몬스터의 애니메이션 인스턴스를 받아놓음 이것을 이용해서 애니 체인지
+	m_AnimInstance = Cast<UMonsterAnimInstance>(GetMesh()->GetAnimInstance()); 
 	m_HPBarWidget = Cast<UHPBar>(m_HPBar->GetWidget());
 	m_HPBarWidget->SetDelegate<AMonster>(this, &AMonster::NameWidgetCallback);
 
@@ -185,7 +184,6 @@ float AMonster::TakeDamage(float DamageAmount,struct FDamageEvent const& DamageE
 		UchuchuGameInstance* gameinst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance()); // 게임 인스턴스는 레벨이 몇개이던 하나만 만들어짐
 		if (gameinst)
 		{
-
 			const FUIItemDataInfo* iteminfo = gameinst->FindUIItemInfo(m_DropItemArray[itemindex]);
 			if (iteminfo)
 			{

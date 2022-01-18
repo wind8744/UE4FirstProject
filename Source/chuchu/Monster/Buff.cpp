@@ -12,6 +12,10 @@ ABuff::ABuff()
 
 	// 그냥 부모 MOnsterAI컨트롤러가 기본이 되어이쓰으모로 바꺼준다
 	AIControllerClass = ABuffAIController::StaticClass();
+
+
+	// 드랍 아이템
+	m_DropItemArray.Add(TEXT("GreatSword"));
 }
 
 // Called when the game starts or when spawned

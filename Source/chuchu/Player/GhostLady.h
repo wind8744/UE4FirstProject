@@ -79,6 +79,9 @@ public:
 	//test
 	TSubclassOf<AGreyStoneSkill1> m_Skill1class;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		FVector	m_SkillboxTest;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -109,6 +112,8 @@ public:
 	virtual void AttackEnd();
 	virtual void ChangeWeaponSocket();
 	virtual void UseSkill();
+	void Skill2Effect();
+	void Skill2EffectEnd();
 
 	//skill
 	virtual void Skill3Loop();
@@ -122,8 +127,8 @@ protected:
 	void InitWeaponSocket(); //무기 탈착 시 애니메이션 , 소켓 초기화
 
 	//skill effect
-	void LaunchGhostLady(const FVector _launchVelocity, float _distance, float _initTime, bool _FrictionFactor = true);
-	void GhostLadySkill4();
+	void LaunchGhostLady(const FVector LaunchVelocity, float Distance, float InitTime, bool FrictionFactor= true);
+	void GhostLadySkillCollisionBox(FVector AttackBoxSize = FVector(200.f));
 
 public:
 	UFUNCTION()

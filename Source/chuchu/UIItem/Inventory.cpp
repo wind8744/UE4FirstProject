@@ -220,7 +220,8 @@ bool UInventory::RemoveItem(UObject* Item)
 				{
 					FString test1 = Itemdata->GetNameText();
 					PrintViewport(1.f, FColor::Red, test1);
-					int32 ret = Itemdata->CountDown();
+					//int32 ret = Itemdata->CountDown();
+					int32 ret = Items[a]->CountDown();
 					if (ret>=0) //0개가 아니면 숫자만 다운
 					{
 						return true;

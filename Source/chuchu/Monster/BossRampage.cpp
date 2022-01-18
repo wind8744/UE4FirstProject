@@ -48,6 +48,13 @@ ABossRampage::ABossRampage()
 
 	m_MonsterInfoName = TEXT("BossRampage");
 	m_SkillNum = 0;
+	
+	m_Atime = 0.f;
+	m_EnableAI = false;
+
+
+	// 드랍 아이템
+	m_DropItemArray.Add(TEXT("MpPotion"));
 }
 
 // Called when the game starts or when spawned
@@ -55,6 +62,9 @@ void ABossRampage::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//AIControllerClass = nullptr;
+	GetMesh()->ToggleVisibility();
+	m_HPBar->ToggleVisibility();
 	SetActorRelativeScale3D(FVector(3, 3, 3)); //크기 조절
 }
 
@@ -62,6 +72,18 @@ void ABossRampage::BeginPlay()
 void ABossRampage::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	m_Atime += DeltaTime;
+	if (!m_EnableAI)
+	{
+		if (m_Atime >= 30.f)
+		{
+			GetMesh()->ToggleVisibility();
+			m_HPBar->ToggleVisibility();
+			//AIControllerClass = ARamBossAIController::StaticClass();
+			m_EnableAI = true;
+		}
+	}
 
 }
 
@@ -146,4 +168,9 @@ void ABossRampage::MakeOriMaterial()
 		GetMesh()->SetMaterial(i, m_CurMatArray[i]);
 	}
 
+}
+void ABossRampage::Death()
+{
+	//m_SpawnPoint->Death();
+	Destroy();
 }

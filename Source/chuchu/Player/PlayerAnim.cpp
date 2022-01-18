@@ -3,6 +3,7 @@
 
 #include "PlayerAnim.h"
 #include "PlayerCharacter.h"
+#include "GhostLady.h"
 
 UPlayerAnim::UPlayerAnim()
 {
@@ -256,6 +257,19 @@ void UPlayerAnim::AnimNotify_Skill2Shake()
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(TryGetPawnOwner());
 	Player->ShakeCamera();
+}
+
+void UPlayerAnim::AnimNotify_Skill2Effect()
+{
+	AGhostLady* Player = Cast<AGhostLady>(TryGetPawnOwner());
+	if(Player)
+		Player->Skill2Effect();
+}
+void UPlayerAnim::AnimNotify_Skill2EffectEnd()
+{
+	AGhostLady* Player = Cast<AGhostLady>(TryGetPawnOwner());
+	if (Player)
+		Player->Skill2EffectEnd();
 }
 
 void UPlayerAnim:: AnimNotify_TimeDelayStart()

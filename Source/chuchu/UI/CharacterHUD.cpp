@@ -40,7 +40,10 @@ void UCharacterHUD::NativeConstruct()
 		//내거
 		//인스턴스에 이름 저장해놓은것 불러와서 ui에 set
 		UchuchuGameInstance* GameInst = Cast<UchuchuGameInstance>(GetWorld()->GetGameInstance());
-		const FString playername = "CharacterName";//GameInst->GetPlayerInfoName();		
+		FString playername = "CharacterName";//GameInst->GetPlayerInfoName();		
+
+		const FPlayerTableInfo* PlayerInfo = GameInst->FindPlayerInfo("Knight");
+		playername = PlayerInfo->Name;
 		SetName(playername);
 	}
 }

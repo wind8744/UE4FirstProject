@@ -7,15 +7,14 @@
 AStartGameMode::AStartGameMode()
 {
 	//start BP 가져오기
-	static ConstructorHelpers::FClassFinder<UStartWidget>	StartHUDClass(TEXT("WidgetBlueprint'/Game/UI/UI_Start.UI_Start_C'"));
+	static ConstructorHelpers::FClassFinder<UStartWidget>	MainStartHUDClass(TEXT("WidgetBlueprint'/Game/UI/UI_MainStartHUD.UI_MainStartHUD_C'"));
 
-	if (StartHUDClass.Succeeded())
+	if (MainStartHUDClass.Succeeded())
 
-		m_StartHUDClass = StartHUDClass.Class;
+		m_MainStartHUDClass = MainStartHUDClass.Class;
 }
 
-void AStartGameMode::InitGame(const FString& MapName,
-	const FString& Options, FString& ErrorMessage)
+void AStartGameMode::InitGame(const FString& MapName,const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 }
@@ -24,11 +23,10 @@ void AStartGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsValid(m_StartHUDClass))
+	if (IsValid(m_MainStartHUDClass))
 	{
 
-		m_StartHUD = Cast<UStartWidget>(CreateWidget(GetWorld(),
-			m_StartHUDClass));
+		m_StartHUD = Cast<UStartWidget>(CreateWidget(GetWorld(), m_MainStartHUDClass));
 
 		if (m_StartHUD)
 			m_StartHUD->AddToViewport();

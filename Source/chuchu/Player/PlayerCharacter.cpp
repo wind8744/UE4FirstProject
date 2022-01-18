@@ -10,6 +10,7 @@
 #include "../chuchuGameInstance.h"
 #include "../Material/PhysicalMaterialBase.h"
 #include "../Effect/GhostTrail.h"
+#include "../Effect/NormalEffect.h"
 
 /*
 언리얼엔진4에서 생성자는 에디터에서 게임을 실행할 경우 에디터에 배치되는 그 순간 호출된다.
@@ -248,6 +249,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill3Key);
 	PlayerInputComponent->BindAction(TEXT("Skill3"), EInputEvent::IE_Released, this, &APlayerCharacter::Skill3KeyReleased);
 	PlayerInputComponent->BindAction(TEXT("Skill4"), EInputEvent::IE_Pressed, this, &APlayerCharacter::Skill4Key);
+	PlayerInputComponent->BindAction(TEXT("Drink"), EInputEvent::IE_Pressed, this, &APlayerCharacter::DrinkKey);
 }
 
 void APlayerCharacter::Skill3KeyReleased()
@@ -661,7 +663,7 @@ void APlayerCharacter::UseSkill(int32 Index) {}
 void APlayerCharacter::UseSkillFire(int32 Index) {}
 void APlayerCharacter::RemoveItem(EEquipType EquipmentType) {}
 void APlayerCharacter::EquipItem(EEquipType EquipmentType, const FString& EquipmentPath) {}
-#include "../Effect/NormalEffect.h"
+
 void APlayerCharacter::UseItem() 
 {
 
@@ -691,7 +693,23 @@ void APlayerCharacter::UseItem()
 			}
 		}
 	}
+
+
 }
+
+void APlayerCharacter::DrinkKey()
+{
+	AchuchuGameModeBase* GameMode = Cast<AchuchuGameModeBase>(GetWorld()->GetAuthGameMode());
+
+	if (GameMode)
+	{
+		UItemData* ItemData = NewObject<UItemData>(this, UItemData::StaticClass());
+		ItemData->SetNameText("Health");
+		ItemData->SetItemType(EItemType::Food, EEquipType::NONE);
+		GameMode->GetMainHUD()->GetInventory()->ItemClick(ItemData);
+	}
+}
+
 void APlayerCharacter::ChangeWeaponSocket() {}
 void APlayerCharacter::Skill3Loop(){}
 

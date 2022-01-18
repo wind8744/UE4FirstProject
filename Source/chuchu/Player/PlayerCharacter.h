@@ -165,6 +165,7 @@ public:
 	void Skill4Key();
 	void DashKey();
 	void EquipWeaponKey();
+	void DrinkKey();
 
 protected:
 	virtual void Attack();

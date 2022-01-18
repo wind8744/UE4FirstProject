@@ -170,7 +170,7 @@ public:
 
 
 public:
-	void Death();
+	virtual void Death();
 
 public:
 	virtual void NormalAttack();
