@@ -28,8 +28,8 @@ class CHUCHU_API ABossSavarog : public AMonster
 public:
 	ABossSavarog();
 
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	//	UCapsuleComponent* m_CollisionCapsuleRight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+		UCapsuleComponent* m_CollisionCapsule;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		TArray<UAnimMontage*>	m_AttackMontageArray;
@@ -39,6 +39,7 @@ public:
 	TArray<UMaterialInterface*> m_CurMatArray;
 	FTimerHandle				m_OriMatTimer;
 
+	bool						m_bStart;
 	bool						m_bAttackEnd;
 	bool						m_bInDistance;
 	bool						m_bAnim;
